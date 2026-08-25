@@ -29,6 +29,7 @@ export default defineConfig({
     extraHTTPHeaders: {
       Accept: 'application/json',
       'Content-Type': 'application/json'
-    }
+    },
+    trace: 'retain-on-failure',
   }
 });
