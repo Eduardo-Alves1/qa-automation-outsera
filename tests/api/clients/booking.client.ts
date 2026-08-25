@@ -32,11 +32,13 @@ export class BookingClient {
         });
     }
 
-    async deleteBooking(bookingId: number, token: string): Promise<APIResponse> {
+    async deleteBooking(bookingId: number, token?: string): Promise<APIResponse> {
         return this.request.delete(`/booking/${bookingId}`, {
-            headers: {
+            headers: token 
+            ? {
                 'Cookie': `token=${token}`
-            }
+            } : {}
+        
         });
     }
 }
