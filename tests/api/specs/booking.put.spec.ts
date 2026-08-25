@@ -7,7 +7,6 @@ import type { Booking, CreateBookingResponse } from '../models/booking.model';
 import type { AuthResponse } from '../models/auth.model';
 
 
-
 test.describe(
     'Booking API - PUT',
     {
@@ -39,6 +38,9 @@ test.describe(
 
             const authBody: AuthResponse =
                 await authResponse.json();
+
+            expect(authBody.token).toBeDefined();
+            expect(authBody.token).not.toBe('');
 
             token = authBody.token;
 
@@ -86,6 +88,20 @@ test.describe(
                     await response.json();
 
                 expect(body)
+                    .toEqual(updatedBookingData);
+
+                // Confirma que os dados atualizados foram persistidos
+                const getResponse =
+                    await bookingClient.getBookingById(
+                        bookingId
+                    );
+
+                expect(getResponse.status()).toBe(200);
+
+                const persistedBooking: Booking =
+                    await getResponse.json();
+
+                expect(persistedBooking)
                     .toEqual(updatedBookingData);
             }
         );
