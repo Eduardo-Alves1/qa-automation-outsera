@@ -8,5 +8,5 @@ export interface AuthResponse {
 }
 
 export interface AuthErrorResponse {
-    error: string;
+    reason: string;
 }
