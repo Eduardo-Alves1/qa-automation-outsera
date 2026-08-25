@@ -6,41 +6,53 @@ import type {
     CreateBookingResponse
 } from '../models/booking.model';
 
-test.describe('Booking API - GET by ID', () => {
+test.describe(
+    'Booking API - GET by ID',
+    {
+        tag: ['@api', '@booking', '@get']
+    },
+    () => {
 
-    let bookingClient: BookingClient;
-    let bookingId: number;
-    let bookingDataModel: Booking;
+        let bookingClient: BookingClient;
+        let bookingId: number;
+        let bookingDataModel: Booking;
 
-    test.beforeEach(async ({ request }) => {
+        test.beforeEach(async ({ request }) => {
 
-        bookingClient = new BookingClient(request);
+            bookingClient = new BookingClient(request);
 
-        bookingDataModel = createValidBookingDataModel();
+            bookingDataModel = createValidBookingDataModel();
 
-        const createResponse =
-            await bookingClient.createBooking(bookingDataModel);
+            const createResponse =
+                await bookingClient.createBooking(bookingDataModel);
 
-        expect(createResponse.status()).toBe(200);
+            expect(createResponse.status()).toBe(200);
 
-        const createBody: CreateBookingResponse =
-            await createResponse.json();
+            const createBody: CreateBookingResponse =
+                await createResponse.json();
 
-        bookingId = createBody.bookingid;
-    });
+            bookingId = createBody.bookingid;
+        });
 
-    test('deve retornar uma reserva pelo ID com sucesso', async () => {
+        test(
+            'deve retornar uma reserva pelo ID com sucesso',
+            {
+                tag: ['@positive', '@smoke', '@regression']
+            },
+            async () => {
 
-        const response =
-            await bookingClient.getBookingById(bookingId);
+                const response =
+                    await bookingClient.getBookingById(bookingId);
 
-        expect(response.status()).toBe(200);
+                expect(response.status()).toBe(200);
 
-        expect(response.headers()['content-type'])
-            .toContain('application/json');
+                expect(response.headers()['content-type'])
+                    .toContain('application/json');
 
-        const body: Booking = await response.json();
+                const body: Booking = await response.json();
 
-        expect(body).toEqual(bookingDataModel);
-    });
-});
+                expect(body).toEqual(bookingDataModel);
+            }
+        );
+    }
+);

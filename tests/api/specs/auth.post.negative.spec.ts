@@ -6,72 +6,87 @@ import {
     createEmptyAuthData
 } from '../data/auth.data';
 
-test.describe('Auth API - POST - Cenários Negativos', () => {
+test.describe(
+    'Auth API - POST - Cenários Negativos',
+    {
+        tag: ['@api', '@auth', '@post']
+    },
+    () => {
 
-    let authClient: AuthClient;
+        let authClient: AuthClient;
 
-    test.beforeEach(async ({ request }) => {
-        authClient =
-            new AuthClient(request);
-    });
+        test.beforeEach(async ({ request }) => {
+            authClient =
+                new AuthClient(request);
+        });
 
-    test(
-        'deve retornar erro ao criar token sem username',
-        async () => {
-            const response =
-                await authClient.createAuthToken(
-                    createAuthDataWithoutUsername()
-                );
+        test(
+            'deve retornar erro ao criar token sem username',
+            {
+                tag: ['@negative', '@regression']
+            },
+            async () => {
+                const response =
+                    await authClient.createAuthToken(
+                        createAuthDataWithoutUsername()
+                    );
 
-            expect(response.status()).toBe(200);
-            expect(response.headers()['content-type'])
-                .toContain('application/json');
+                expect(response.status()).toBe(200);
+                expect(response.headers()['content-type'])
+                    .toContain('application/json');
 
-            const body =
-                await response.json();
+                const body =
+                    await response.json();
 
-            expect(body.reason)
-                .toBe('Bad credentials');
-        }
-    );
+                expect(body.reason)
+                    .toBe('Bad credentials');
+            }
+        );
 
-    test(
-        'deve retornar erro ao criar token sem password',
-        async () => {
-            const response =
-                await authClient.createAuthToken(
-                    createAuthDataWithoutPassword()
-                );
+        test(
+            'deve retornar erro ao criar token sem password',
+            {
+                tag: ['@negative', '@regression']
+            },
+            async () => {
+                const response =
+                    await authClient.createAuthToken(
+                        createAuthDataWithoutPassword()
+                    );
 
-            expect(response.status()).toBe(200);
-            expect(response.headers()['content-type'])
-                .toContain('application/json');
+                expect(response.status()).toBe(200);
+                expect(response.headers()['content-type'])
+                    .toContain('application/json');
 
-            const body =
-                await response.json();
+                const body =
+                    await response.json();
 
-            expect(body.reason)
-                .toBe('Bad credentials');
-        }
-    );
+                expect(body.reason)
+                    .toBe('Bad credentials');
+            }
+        );
 
-    test(
-        'deve retornar erro ao criar token com body vazio',
-        async () => {
-            const response =
-                await authClient.createAuthToken(
-                    createEmptyAuthData()
-                );
+        test(
+            'deve retornar erro ao criar token com body vazio',
+            {
+                tag: ['@negative', '@regression']
+            },
+            async () => {
+                const response =
+                    await authClient.createAuthToken(
+                        createEmptyAuthData()
+                    );
 
-            expect(response.status()).toBe(200);
-            expect(response.headers()['content-type'])
-                .toContain('application/json');
+                expect(response.status()).toBe(200);
+                expect(response.headers()['content-type'])
+                    .toContain('application/json');
 
-            const body =
-                await response.json();
+                const body =
+                    await response.json();
 
-            expect(body.reason)
-                .toBe('Bad credentials');
-        }
-    );
-});
+                expect(body.reason)
+                    .toBe('Bad credentials');
+            }
+        );
+    }
+);

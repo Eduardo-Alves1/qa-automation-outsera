@@ -7,55 +7,64 @@ import type { Booking, CreateBookingResponse } from '../models/booking.model';
 import type { AuthResponse } from '../models/auth.model';
 
 
-test.describe('Booking API - DELETE', () => {
+test.describe(
+    'Booking API - DELETE',
+    {
+        tag: ['@api', '@booking', '@delete']
+    },
+    () => {
 
-    let bookingClient: BookingClient;
-    let authClient: AuthClient;
-    let bookingId: number;
-    let token: string;
+        let bookingClient: BookingClient;
+        let authClient: AuthClient;
+        let bookingId: number;
+        let token: string;
 
-    test.beforeEach(async ({ request }) => {
+        test.beforeEach(async ({ request }) => {
 
-        bookingClient =
-            new BookingClient(request);
-        authClient =
-            new AuthClient(request);
-        // Autenticação
-        const authResponse =
-            await authClient.createAuthToken(
-                createValidAuthData()
-            );
-        const authBody: AuthResponse =
-            await authResponse.json();
-        token = authBody.token;
-
-        // Criação da reserva
-        const bookingData =
-            createValidBookingDataModel();
-        const createResponse =
-            await bookingClient.createBooking(
-                bookingData
-            );
-        const createBody: CreateBookingResponse =
-            await createResponse.json();
-        bookingId = createBody.bookingid;
-    });
-
-    test(
-        'deve deletar uma reserva com sucesso',
-        async () => {
-            const response =
-                await bookingClient.deleteBooking(
-                    bookingId,
-                    token
+            bookingClient =
+                new BookingClient(request);
+            authClient =
+                new AuthClient(request);
+            // Autenticação
+            const authResponse =
+                await authClient.createAuthToken(
+                    createValidAuthData()
                 );
-            expect(response.status()).toBe(201);
-            // Verificação se a reserva foi realmente deletada
-            const getResponse =
-                await bookingClient.getBookingById(
-                    bookingId
+            const authBody: AuthResponse =
+                await authResponse.json();
+            token = authBody.token;
+
+            // Criação da reserva
+            const bookingData =
+                createValidBookingDataModel();
+            const createResponse =
+                await bookingClient.createBooking(
+                    bookingData
                 );
-            expect(getResponse.status()).toBe(404);
-        }
-    );
-});
+            const createBody: CreateBookingResponse =
+                await createResponse.json();
+            bookingId = createBody.bookingid;
+        });
+
+        test(
+            'deve deletar uma reserva com sucesso',
+            {
+                tag: ['@positive', '@smoke', '@regression']
+            },
+            async () => {
+                const response =
+                    await bookingClient.deleteBooking(
+                        bookingId,
+                        token
+                    );
+                expect(response.status()).toBe(201);
+                // Verificação se a reserva foi realmente deletada
+                const getResponse =
+                    await bookingClient.getBookingById(
+                        bookingId
+                    );
+                expect(getResponse.status()).toBe(404);
+            }
+        );
+    }
+);

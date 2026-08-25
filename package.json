@@ -6,7 +6,17 @@
   "scripts": {
     "test": "playwright test",
     "test:api": "playwright test tests/api",
-    "test:api:report": "playwright show-report"
+    "test:api:smoke": "playwright test tests/api --grep \"@smoke\"",
+    "test:api:regression": "playwright test tests/api --grep \"@regression\"",
+    "test:api:negative": "playwright test tests/api --grep \"@negative\"",
+    "test:api:auth": "playwright test tests/api --grep \"@auth\"",
+    "test:api:booking": "playwright test tests/api --grep \"@booking\"",
+    "test:api:get": "playwright test tests/api --grep \"@get\"",
+    "test:api:post": "playwright test tests/api --grep \"@post\"",
+    "test:api:put": "playwright test tests/api --grep \"@put\"",
+    "test:api:delete": "playwright test tests/api --grep \"@delete\"",
+    "test:api:report": "playwright show-report",
+    "report": "playwright show-report"
   },
   "keywords": [],
   "author": "",
