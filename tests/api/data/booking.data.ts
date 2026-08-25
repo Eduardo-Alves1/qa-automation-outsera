@@ -29,3 +29,29 @@ export function createUpdatedBookingDataModel(): Booking {
 }
 
 //cada teste receberá um novo objeto e depois poderemos sobrescrever campos facilmente para cenários negativos.
+export function createBookingDataWithoutFirstname(): Partial<Booking> {
+    return {
+        lastname: 'Alves',
+        totalprice: 150,
+        depositpaid: true,
+        bookingdates: {
+            checkin: '2023-01-01',
+            checkout: '2023-01-02'
+        },
+        additionalneeds: 'Café da manhã'
+    };
+}
+
+export function createBookingDataWithoutBookingDates(): Partial<Booking> {
+    return {
+        firstname: 'Eduardo',
+        lastname: 'Alves',
+        totalprice: 150,
+        depositpaid: true,
+        additionalneeds: 'Café da manhã'
+    };
+}
+
+export function createEmptyBookingData(): Partial<Booking> {
+    return {};
+}

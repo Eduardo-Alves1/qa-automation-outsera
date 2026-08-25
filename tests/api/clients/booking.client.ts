@@ -17,18 +17,19 @@ export class BookingClient {
         return this.request.get(`/booking/${bookingId}`);
     }
 
-    async createBooking(bookingData: Booking): Promise<APIResponse> {
+    async createBooking(bookingData: Booking | Partial<Booking>): Promise<APIResponse> {
         return this.request.post('/booking', {
             data: bookingData
         });
     }
 
-    async updateBooking(bookingId: number, bookingData: Booking, token: string): Promise<APIResponse> {
+    async updateBooking(bookingId: number, bookingData: Booking, token?: string): Promise<APIResponse> {
         return this.request.put(`/booking/${bookingId}`, {
             data: bookingData,
-            headers: {
+            headers: token
+            ? {
                 'Cookie': `token=${token}`
-            }
+            } : {}
         });
     }
 
@@ -38,7 +39,6 @@ export class BookingClient {
             ? {
                 'Cookie': `token=${token}`
             } : {}
-        
         });
     }
 }
