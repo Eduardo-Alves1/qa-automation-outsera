@@ -23,6 +23,24 @@ export class BookingClient {
         });
     }
 
+    async createBookingWithRawPayload(rawPayload: string): Promise<APIResponse> {
+        return this.request.post('/booking', {
+            data: rawPayload,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
+
+    async requestBookingByIdWithMethod(
+        bookingId: number,
+        method: string
+    ): Promise<APIResponse> {
+        return this.request.fetch(`/booking/${bookingId}`, {
+            method
+        });
+    }
+
     async updateBooking(bookingId: number, bookingData: Booking, token?: string): Promise<APIResponse> {
         return this.request.put(`/booking/${bookingId}`, {
             data: bookingData,
