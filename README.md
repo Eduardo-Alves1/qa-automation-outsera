@@ -2,7 +2,7 @@
 
 Projeto de automação de testes desenvolvido com **Playwright + TypeScript**, com foco inicial na validação de APIs REST utilizando a **Restful Booker** como API pública de apoio.
 
-A suíte foi estruturada com separação de responsabilidades, tipagem forte, massas de teste reutilizáveis, cenários positivos e negativos, execução por tags e geração de evidências com **Allure Report**.
+A suíte foi estruturada com separação de responsabilidades, tipagem forte, massas de teste reutilizáveis, cenários positivos e negativos, execução por tags, geração de evidências com **Allure Report** e integração contínua com **GitHub Actions**.
 
 ## Objetivos
 
@@ -13,12 +13,15 @@ O projeto tem como objetivos:
 - cobrir cenários positivos e negativos;
 - exercitar os métodos HTTP `GET`, `POST`, `PUT` e `DELETE`;
 - validar autenticação e autorização;
+- validar payloads incompletos, vazios e JSON malformado;
+- validar tentativa de uso de método HTTP não suportado pelo recurso;
 - evitar dependência de massas fixas sempre que possível;
 - permitir execuções segmentadas por tags;
 - gerar relatórios de execução com Allure;
+- executar a suíte automaticamente em CI/CD;
 - manter uma estrutura preparada para evolução do projeto.
 
-> Atualmente, o repositório contém a suíte de testes automatizados de API. As próximas etapas da avaliação serão adicionadas gradualmente ao mesmo projeto.
+> A frente de API está concluída. As próximas etapas do projeto serão a automação E2E e, posteriormente, os testes de performance previstos na avaliação.
 
 ## Tecnologias utilizadas
 
@@ -31,6 +34,7 @@ O projeto tem como objetivos:
 | allure-playwright | ^3.11.0 | Integração Playwright + Allure |
 | dotenv | ^17.4.2 | Variáveis de ambiente |
 | @types/node | ^26.2.0 | Tipagens do Node.js |
+| GitHub Actions | CI/CD | Execução automatizada da suíte |
 
 As versões declaradas podem ser consultadas em `package.json` e `package-lock.json`.
 
@@ -50,6 +54,9 @@ Essa configuração é lida pelo `playwright.config.ts` e disponibilizada aos te
 
 ```text
 qa-automation-outsera/
+├── .github/
+│   └── workflows/
+│       └── api-tests.yml
 ├── tests/
 │   └── api/
 │       ├── clients/
@@ -72,7 +79,9 @@ qa-automation-outsera/
 │           ├── booking.put.spec.ts
 │           ├── booking.put.negative.spec.ts
 │           ├── booking.delete.spec.ts
-│           └── booking.delete.negative.spec.ts
+│           ├── booking.delete.negative.spec.ts
+│           └── booking.method.negative.spec.ts
+├── .env.example
 ├── casos-de-teste.md
 ├── playwright.config.ts
 ├── tsconfig.json
@@ -89,6 +98,7 @@ qa-automation-outsera/
 | `data` | Centraliza massas de dados válidas, inválidas e incompletas |
 | `models` | Define contratos e interfaces TypeScript |
 | `specs` | Contém os cenários, pré-condições e assertions |
+| `.github/workflows` | Contém a automação de CI/CD do projeto |
 
 Essa separação evita concentrar construção de payloads, comunicação HTTP e validações no mesmo arquivo de teste.
 
@@ -112,12 +122,14 @@ A suíte atual cobre cenários positivos e negativos para autenticação e reser
 - criar reserva;
 - criar reserva sem campos obrigatórios;
 - criar reserva com body vazio;
+- criar reserva com JSON malformado;
 - atualizar reserva com token válido;
 - atualizar reserva sem token;
 - atualizar reserva com token inválido;
 - excluir reserva com token válido;
 - excluir reserva sem token;
-- excluir reserva com token inválido.
+- excluir reserva com token inválido;
+- rejeitar método HTTP não suportado para `/booking/{id}`.
 
 Nos fluxos de alteração e exclusão, a suíte também verifica o efeito final da operação. Por exemplo:
 
@@ -137,7 +149,7 @@ GET /booking/{id}
 404
 ```
 
-A descrição detalhada dos **18 casos de teste atualmente documentados** está disponível em [`casos-de-teste.md`](./casos-de-teste.md).
+Os cenários automatizados estão implementados em `tests/api/specs`, e os casos de teste funcionais documentados podem ser consultados em [`casos-de-teste.md`](./casos-de-teste.md).
 
 ## Estratégia de tags
 
@@ -206,17 +218,17 @@ Instale as dependências:
 npm install
 ```
 
-Como a suíte atual é somente de API, não é necessário instalar browsers para executar esses testes.
+Como a suíte atual de API não utiliza navegador, não é necessário instalar browsers para executar essa frente. A instalação dos browsers será necessária para a automação E2E.
 
 ## Configuração do ambiente
 
-Crie um arquivo `.env` na raiz do projeto:
+O projeto disponibiliza um arquivo `.env.example`. Crie seu `.env` a partir dele:
 
 ```bash
-touch .env
+cp .env.example .env
 ```
 
-Adicione:
+Conteúdo esperado:
 
 ```env
 BASE_API_URL=https://restful-booker.herokuapp.com
@@ -358,7 +370,9 @@ Exemplos existentes na suíte:
 
 - autenticação inválida retorna HTTP `200` e informa a falha por meio de `reason: "Bad credentials"`;
 - exclusão bem-sucedida retorna HTTP `201`;
-- determinados payloads inválidos de criação retornam HTTP `500`.
+- determinados payloads inválidos de criação retornam HTTP `500`;
+- JSON malformado é rejeitado como requisição inválida;
+- métodos não suportados para determinado recurso devem retornar resposta não bem-sucedida.
 
 Esses comportamentos são tratados explicitamente nos cenários automatizados.
 
@@ -371,29 +385,69 @@ Esses comportamentos são tratados explicitamente nos cenários automatizados.
 - criação dinâmica de reservas para reduzir dependência de IDs fixos;
 - validação de status code, headers e body;
 - cenários positivos e negativos;
+- validação de payload JSON malformado;
+- validação de método HTTP não suportado;
 - validação de persistência após atualização;
 - validação do efeito da exclusão por consulta posterior;
 - execução seletiva por tags;
 - variáveis de ambiente para configuração externa;
 - relatórios com Allure;
-- trace mantido em caso de falha.
+- trace mantido em caso de falha;
+- execução automatizada por GitHub Actions.
 
 ## Documentação de casos de teste
 
-Os casos de teste detalhados, contendo pré-condições, passos e resultados esperados, estão disponíveis em:
+Os casos de teste funcionais, contendo pré-condições, passos e resultados esperados, estão disponíveis em:
 
 [`casos-de-teste.md`](./casos-de-teste.md)
 
 ## CI/CD
 
-A integração com CI/CD será adicionada na próxima etapa do projeto. A estratégia prevista é utilizar **GitHub Actions** para executar validação TypeScript, suítes de testes por contexto e disponibilizar os resultados/relatórios como artefatos da execução.
+A integração contínua está implementada com **GitHub Actions** no workflow:
+
+```text
+.github/workflows/api-tests.yml
+```
+
+O pipeline executa:
+
+```text
+Pull Request → main
+        ↓
+TypeScript validation
+        ↓
+Smoke Tests
+        ↓
+Allure Report
+        ↓
+Artifact
+```
+
+```text
+Push → main
+        ↓
+TypeScript validation
+        ↓
+Regression Tests
+        ↓
+Allure Report
+        ↓
+Artifact
+```
+
+Também existe execução manual via `workflow_dispatch`, permitindo selecionar a suíte `smoke`, `regression` ou `all`.
+
+Os resultados brutos e o relatório Allure são disponibilizados como artifacts da execução do GitHub Actions.
 
 ## Evolução do projeto
 
-A arquitetura foi preparada para receber novas camadas da avaliação sem misturar responsabilidades. Entre as próximas evoluções estão:
+A frente de API está concluída e a arquitetura está preparada para receber as próximas camadas da avaliação sem misturar responsabilidades.
 
-- integração com GitHub Actions;
+Próximas evoluções:
+
 - automação E2E com Playwright;
 - integração com Cucumber para os cenários E2E exigidos pela avaliação;
+- aplicação do Page Object Pattern na automação web;
+- integração da suíte E2E ao GitHub Actions;
 - testes de performance em estrutura separada;
 - evolução das evidências e relatórios no pipeline.
