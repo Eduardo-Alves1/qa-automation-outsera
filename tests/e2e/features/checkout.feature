@@ -1,24 +1,25 @@
+# language: pt
 @e2e @checkout
-Feature: Checkout
-  As an authenticated customer
-  I want to complete a purchase
-  So that I can validate the end-to-end checkout journey
+Funcionalidade: Checkout
+  Como cliente autenticado
+  Quero concluir uma compra
+  Para validar o fluxo completo de checkout
 
   @positive @smoke @regression
-  Scenario: Complete checkout successfully
-    Given the user is authenticated in SauceDemo
-    When the user adds a product to the cart
-    And opens the cart
-    And starts the checkout
-    And fills the checkout information with valid data
-    And finishes the purchase
-    Then the order completion message should be displayed
+  Cenário: Concluir checkout com sucesso
+    Dado que o usuário está autenticado no SauceDemo
+    Quando o usuário adiciona um produto ao carrinho
+    E acessa o carrinho
+    E inicia o checkout
+    E preenche os dados do checkout com informações válidas
+    E finaliza a compra
+    Então a mensagem de conclusão do pedido deve ser exibida
 
   @negative @regression
-  Scenario: Prevent checkout when required customer data is missing
-    Given the user is authenticated in SauceDemo
-    When the user adds a product to the cart
-    And opens the cart
-    And starts the checkout
-    And continues the checkout without required customer data
-    Then a checkout validation error should be displayed
+  Cenário: Impedir checkout sem dados obrigatórios do cliente
+    Dado que o usuário está autenticado no SauceDemo
+    Quando o usuário adiciona um produto ao carrinho
+    E acessa o carrinho
+    E inicia o checkout
+    E continua o checkout sem preencher os dados obrigatórios
+    Então uma mensagem de erro de validação do checkout deve ser exibida
