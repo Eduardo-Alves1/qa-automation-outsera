@@ -1,5 +1,6 @@
 import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
+import os from 'node:os';
 
 dotenv.config();
 
@@ -21,7 +22,19 @@ export default defineConfig({
 
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'playwright-report', open: 'never' }]
+    [
+      'allure-playwright',
+      {
+        resultsDir: 'allure-results',
+        environmentInfo: {
+          os_platform: os.platform(),
+          os_release: os.release(),
+          node_version: process.version,
+          baseUrl: process.env.BASE_API_URL,
+          playwright_version: process.env.PLAYWRIGHT_VERSION,
+        }
+      }
+    ]
   ],
 
   use: {
