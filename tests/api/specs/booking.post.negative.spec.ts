@@ -64,5 +64,24 @@ test.describe(
                 expect(response.status()).toBe(500);
             }
         );
+
+        test(
+            'deve rejeitar payload JSON malformado',
+            {
+                tag: ['@negative', '@regression']
+            },
+            async () => {
+                const malformedPayload =
+                    '{"firstname":"Eduardo","lastname":"Alves"';
+
+                const response =
+                    await bookingClient.createBookingWithRawPayload(
+                        malformedPayload
+                    );
+
+                expect(response.status()).toBe(400);
+                expect(response.ok()).toBeFalsy();
+            }
+        );
     }
 );
