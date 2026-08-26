@@ -39,3 +39,14 @@ Then(
     ).toBeVisible();
   }
 );
+
+When('o usuário tenta realizar o login sem informar o usuário', async function (this: E2EWorld) {
+
+  await this.loginPage!.login('', e2eUsers.standard.password);
+});
+
+Then('uma mensagem informando que o usuário é obrigatório deve ser exibida', async function (this: E2EWorld) {
+  await expect(
+    this.loginPage!.errorMessage
+  ).toHaveText('Epic sadface: Username is required');
+});

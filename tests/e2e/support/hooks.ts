@@ -23,7 +23,7 @@ Before(async function (this: E2EWorld) {
 
   this.browser = await chromium.launch({
     headless: false,
-    slowMo: 500
+    slowMo: 1000
   });
 
   this.context = await this.browser.newContext();
