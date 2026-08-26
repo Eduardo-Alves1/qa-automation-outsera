@@ -1,17 +1,18 @@
+# language: pt
 @e2e @login
-Feature: Login
-  As a customer
-  I want to authenticate in SauceDemo
-  So that I can access the product catalog
+Funcionalidade: Login
+  Como cliente
+  Quero me autenticar no SauceDemo
+  Para acessar o catálogo de produtos
 
   @positive @smoke @regression
-  Scenario: Login successfully with valid credentials
-    Given the user is on the SauceDemo login page
-    When the user logs in with valid credentials
-    Then the inventory page should be displayed
+  Cenário: Realizar login com credenciais válidas
+    Dado que o usuário está na página de login do SauceDemo
+    Quando o usuário realiza o login com credenciais válidas
+    Então a página de produtos deve ser exibida
 
   @negative @regression
-  Scenario: Reject login with invalid credentials
-    Given the user is on the SauceDemo login page
-    When the user logs in with invalid credentials
-    Then a login error message should be displayed
+  Cenário: Rejeitar login com credenciais inválidas
+    Dado que o usuário está na página de login do SauceDemo
+    Quando o usuário realiza o login com credenciais inválidas
+    Então uma mensagem de erro de login deve ser exibida
