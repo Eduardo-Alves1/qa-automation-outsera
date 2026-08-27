@@ -14,6 +14,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
+import { MenuPage } from '../pages/MenuPage';
 
 export class E2EWorld extends World {
 
@@ -25,6 +26,7 @@ export class E2EWorld extends World {
   inventoryPage?: InventoryPage;
   cartPage?: CartPage;
   checkoutPage?: CheckoutPage;
+  menuPage?: MenuPage;
 
   constructor(options: IWorldOptions) {
     super(options);
@@ -43,6 +45,7 @@ export class E2EWorld extends World {
     this.inventoryPage = undefined;
     this.cartPage = undefined;
     this.checkoutPage = undefined;
+    this.menuPage = undefined;
   }
 }
 
