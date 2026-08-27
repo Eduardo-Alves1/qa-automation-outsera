@@ -276,7 +276,7 @@ O projeto utiliza TypeScript em modo `strict`. Essa validação também é execu
 - verificar exclusão por `GET` posterior;
 - método HTTP não suportado em `/booking/{id}`.
 
-Os fluxos positivos de `GET`, `POST`, `PUT` e `DELETE` validam o contrato aplicável de **status code, headers e body**. Para o `DELETE`, o contrato observado retorna HTTP `201`, `Content-Type: text/plain` e body vazio; a exclusão também é comprovada por consulta posterior.
+Os fluxos positivos de `GET`, `POST`, `PUT` e `DELETE` validam o contrato aplicável de **status code, headers e body**. Para o `DELETE`, o contrato observado retorna HTTP `201`, `Content-Type: text/plain` e body `Created`; a exclusão também é comprovada por consulta posterior.
 
 ## Execução
 
