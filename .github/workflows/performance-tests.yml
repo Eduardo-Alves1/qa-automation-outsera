@@ -3,15 +3,43 @@ name: Performance Tests
 on:
   workflow_dispatch:
     inputs:
+      profile:
+        description: Execution profile (ramp or constant)
+        required: true
+        default: ramp
+        type: choice
+        options:
+          - ramp
+          - constant
       vus:
-        description: Number of virtual users
+        description: Maximum VUs for ramp or fixed VUs for constant
+        required: true
+        default: '25'
+        type: string
+      duration:
+        description: Hold duration per ramp level or total constant duration
+        required: true
+        default: '30s'
+        type: string
+      start_vus:
+        description: Initial VUs for ramp profile
         required: true
         default: '5'
         type: string
-      duration:
-        description: Test duration (for example 30s, 1m, 5m)
+      step_vus:
+        description: VU increment for ramp profile
         required: true
-        default: '30s'
+        default: '5'
+        type: string
+      ramp_duration:
+        description: Time to transition between ramp levels
+        required: true
+        default: '10s'
+        type: string
+      ramp_down_duration:
+        description: Time to ramp down to zero VUs
+        required: true
+        default: '20s'
         type: string
       base_url:
         description: Target base URL
@@ -40,6 +68,13 @@ jobs:
       - name: Execute K6 test
         env:
           PERF_BASE_URL: ${{ inputs.base_url }}
+          K6_PROFILE: ${{ inputs.profile }}
+          K6_MAX_VUS: ${{ inputs.vus }}
+          K6_HOLD_DURATION: ${{ inputs.duration }}
+          K6_START_VUS: ${{ inputs.start_vus }}
+          K6_STEP_VUS: ${{ inputs.step_vus }}
+          K6_RAMP_DURATION: ${{ inputs.ramp_duration }}
+          K6_RAMP_DOWN_DURATION: ${{ inputs.ramp_down_duration }}
           K6_VUS: ${{ inputs.vus }}
           K6_DURATION: ${{ inputs.duration }}
           K6_WEB_DASHBOARD: 'true'
