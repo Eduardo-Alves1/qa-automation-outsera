@@ -1,4 +1,4 @@
-name: API Tests
+name: QA Automation Tests
 
 on:
   pull_request:
@@ -26,6 +26,7 @@ permissions:
 
 env:
   BASE_API_URL: https://restful-booker.herokuapp.com
+  E2E_BASE_URL: https://www.saucedemo.com
   CI: true
 
 jobs:
@@ -71,23 +72,20 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "Running smoke suite for pull request"
+            echo "Running API smoke suite for pull request"
             npm run test:api:smoke
           elif [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "Running regression suite for push to main"
+            echo "Running API regression suite for push to main"
             npm run test:api:regression
           else
             case "${{ inputs.suite }}" in
               smoke)
-                echo "Running smoke suite"
                 npm run test:api:smoke
                 ;;
               regression)
-                echo "Running regression suite"
                 npm run test:api:regression
                 ;;
               all)
-                echo "Running all API tests"
                 npm run test:api
                 ;;
               *)
@@ -97,21 +95,115 @@ jobs:
             esac
           fi
 
-      - name: Generate Allure report
+      - name: Upload API Allure results
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-api-results
+          path: allure-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  e2e-tests:
+    name: Cucumber Playwright E2E tests
+    runs-on: ubuntu-latest
+    needs: typecheck
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Execute E2E test suite
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "Running E2E smoke suite for pull request"
+            npm run test:e2e:smoke
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "Running E2E regression suite for push to main"
+            npm run test:e2e:regression
+          else
+            case "${{ inputs.suite }}" in
+              smoke)
+                npm run test:e2e:smoke
+                ;;
+              regression)
+                npm run test:e2e:regression
+                ;;
+              all)
+                npm run test:e2e
+                ;;
+              *)
+                echo "Invalid suite: ${{ inputs.suite }}"
+                exit 1
+                ;;
+            esac
+          fi
+
+      - name: Upload E2E Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-e2e-results
+          path: allure-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  allure-report:
+    name: Unified Allure report
+    runs-on: ubuntu-latest
+    needs:
+      - api-tests
+      - e2e-tests
+    if: ${{ always() && (needs.api-tests.result != 'skipped' || needs.e2e-tests.result != 'skipped') }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download Allure results
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: allure-*-results
+          path: allure-results
+          merge-multiple: true
+
+      - name: Generate unified Allure report
         shell: bash
         run: |
           if [[ -d "allure-results" ]] && [[ -n "$(ls -A allure-results 2>/dev/null)" ]]; then
             npm run allure:generate
           else
-            echo "No Allure results found. Skipping report generation."
+            echo "No Allure results were produced."
           fi
 
-      - name: Upload Allure artifacts
+      - name: Upload unified Allure report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-api-report-${{ github.run_number }}
+          name: allure-automation-report-${{ github.run_number }}
           path: |
             allure-results/
             allure-report/
