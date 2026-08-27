@@ -22,7 +22,7 @@ setDefaultTimeout(30_000);
 Before(async function (this: E2EWorld) {
 
   this.browser = await chromium.launch({
-    headless: false,
+    headless: true,
     slowMo: 1000
   });
 

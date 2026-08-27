@@ -50,3 +50,24 @@ Then('uma mensagem informando que o usuário é obrigatório deve ser exibida', 
     this.loginPage!.errorMessage
   ).toHaveText('Epic sadface: Username is required');
 });
+
+
+When('o usuário tenta realizar o login sem informar a senha', async function (this: E2EWorld) {
+  await this.loginPage!.login(e2eUsers.standard.username, '');
+});
+
+Then('uma mensagem informando que a senha é obrigatória deve ser exibida', async function (this: E2EWorld) {
+  await expect(
+    this.loginPage!.errorMessage
+  ).toHaveText('Epic sadface: Password is required');
+});
+
+When('o usuário tenta realizar o login com um usuário bloqueado', async function (this: E2EWorld) {
+  await this.loginPage!.login(e2eUsers.locked.username, e2eUsers.locked.password);
+});
+
+Then('uma mensagem informando que o usuário está bloqueado deve ser exibida', async function (this: E2EWorld) {
+  await expect(
+    this.loginPage!.errorMessage
+  ).toHaveText('Epic sadface: Sorry, this user has been locked out.');
+});
