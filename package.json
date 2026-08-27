@@ -22,6 +22,7 @@
     "test:e2e:menu": "cucumber-js --config cucumber.cjs --tags \"@menu\"",
     "test:e2e:smoke": "cucumber-js --config cucumber.cjs --tags \"@smoke\"",
     "test:e2e:regression": "cucumber-js --config cucumber.cjs --tags \"@regression\"",
+    "test:performance": "k6 run tests/performance/load-test.js",
     "test:api:report": "playwright show-report",
     "report": "playwright show-report",
     "allure:clean": "node -e \"const fs=require('fs'); ['allure-results','allure-report'].forEach(p=>fs.rmSync(p,{recursive:true,force:true}))\"",
