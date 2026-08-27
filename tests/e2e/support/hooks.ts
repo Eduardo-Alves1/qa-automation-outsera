@@ -21,14 +21,14 @@ dotenv.config();
 setDefaultTimeout(30_000);
 
 Before(async function (this: E2EWorld) {
+  const isCI = process.env.CI === 'true';
 
   this.browser = await chromium.launch({
-    headless: true,
-    slowMo: 1000
+    headless: isCI,
+    slowMo: isCI ? 0 : 1000
   });
 
   this.context = await this.browser.newContext();
-
   this.page = await this.context.newPage();
 
   this.loginPage = new LoginPage(this.page);
@@ -39,16 +39,13 @@ Before(async function (this: E2EWorld) {
 });
 
 After(async function (this: E2EWorld, scenario) {
-
   if (
     scenario.result?.status === Status.FAILED &&
     this.page
   ) {
-
-    const screenshot =
-      await this.page.screenshot({
-        fullPage: true
-      });
+    const screenshot = await this.page.screenshot({
+      fullPage: true
+    });
 
     await this.attach(
       screenshot,
