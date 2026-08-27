@@ -1,7 +1,7 @@
 {
   "name": "qa-automation-outsera",
   "version": "1.0.0",
-  "description": "QA automation assessment with Playwright, Cucumber, Allure and GitHub Actions",
+  "description": "QA automation assessment with Playwright, Cucumber, K6, Allure and GitHub Actions",
   "main": "index.js",
   "scripts": {
     "test": "npm run test:all",
@@ -23,8 +23,7 @@
     "test:e2e:smoke": "cucumber-js --config cucumber.cjs --tags \"@smoke\"",
     "test:e2e:regression": "cucumber-js --config cucumber.cjs --tags \"@regression\"",
     "test:performance": "k6 run tests/performance/load-test.js",
-    "test:api:report": "playwright show-report",
-    "report": "playwright show-report",
+    "report": "npm run allure:open",
     "allure:clean": "node -e \"const fs=require('fs'); ['allure-results','allure-report'].forEach(p=>fs.rmSync(p,{recursive:true,force:true}))\"",
     "allure:generate": "allure generate allure-results -o allure-report",
     "allure:open": "allure open allure-report",
@@ -34,6 +33,7 @@
     "qa",
     "playwright",
     "cucumber",
+    "k6",
     "allure",
     "automation"
   ],
