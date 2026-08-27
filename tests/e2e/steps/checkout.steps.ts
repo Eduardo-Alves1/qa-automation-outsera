@@ -14,6 +14,15 @@ import {
   products
 } from '../data/users.data';
 
+function extractCurrencyValue(text: string): number {
+  const value = Number(text.replace(/[^0-9.]/g, ''));
+
+  if (Number.isNaN(value)) {
+    throw new Error(`Não foi possível converter o valor monetário: ${text}`);
+  }
+
+  return value;
+}
 
 Given(
   'que o usuário está autenticado no SauceDemo',
@@ -27,22 +36,18 @@ Given(
       );
     }
 
-    // Acessa o SauceDemo
     await this.loginPage!.open(baseUrl);
 
-    // Realiza o login
     await this.loginPage!.login(
       e2eUsers.standard.username,
       e2eUsers.standard.password
     );
 
-    // Garante que o login realmente funcionou
     await expect(
       this.inventoryPage!.title
     ).toHaveText('Products');
   }
 );
-
 
 When(
   'o usuário adiciona um produto ao carrinho',
@@ -53,7 +58,6 @@ When(
     );
   }
 );
-
 
 When(
   'acessa o carrinho',
@@ -67,7 +71,6 @@ When(
   }
 );
 
-
 When(
   'inicia o checkout',
   async function (this: E2EWorld) {
@@ -79,7 +82,6 @@ When(
     ).toBeVisible();
   }
 );
-
 
 When(
   'preenche os dados do checkout com informações válidas',
@@ -95,7 +97,6 @@ When(
   }
 );
 
-
 When(
   'finaliza a compra',
   async function (this: E2EWorld) {
@@ -107,7 +108,6 @@ When(
     await this.checkoutPage!.finish();
   }
 );
-
 
 Then(
   'a mensagem de conclusão do pedido deve ser exibida',
@@ -125,7 +125,6 @@ Then(
   }
 );
 
-
 When(
   'continua o checkout sem preencher os dados obrigatórios',
   async function (this: E2EWorld) {
@@ -134,19 +133,126 @@ When(
   }
 );
 
-
 Then(
   'uma mensagem de erro de validação do checkout deve ser exibida',
   async function (this: E2EWorld) {
 
     await expect(
       this.checkoutPage!.errorMessage
-    ).toBeVisible();
+    ).toHaveText(
+      'Error: First Name is required'
+    );
+  }
+);
+
+When(
+  'preenche somente sobrenome e CEP',
+  async function (this: E2EWorld) {
+
+    await this.checkoutPage!.fillCustomerInformation(
+      '',
+      checkoutData.valid.lastName,
+      checkoutData.valid.postalCode
+    );
+
+    await this.checkoutPage!.continue();
+  }
+);
+
+Then(
+  'uma mensagem informando que o nome é obrigatório deve ser exibida',
+  async function (this: E2EWorld) {
 
     await expect(
       this.checkoutPage!.errorMessage
-    ).toContainText(
-      'First Name is required'
+    ).toHaveText(
+      'Error: First Name is required'
     );
+  }
+);
+
+When(
+  'preenche somente nome e CEP',
+  async function (this: E2EWorld) {
+
+    await this.checkoutPage!.fillCustomerInformation(
+      checkoutData.valid.firstName,
+      '',
+      checkoutData.valid.postalCode
+    );
+
+    await this.checkoutPage!.continue();
+  }
+);
+
+Then(
+  'uma mensagem informando que o sobrenome é obrigatório deve ser exibida',
+  async function (this: E2EWorld) {
+
+    await expect(
+      this.checkoutPage!.errorMessage
+    ).toHaveText(
+      'Error: Last Name is required'
+    );
+  }
+);
+
+When(
+  'preenche somente nome e sobrenome',
+  async function (this: E2EWorld) {
+
+    await this.checkoutPage!.fillCustomerInformation(
+      checkoutData.valid.firstName,
+      checkoutData.valid.lastName,
+      ''
+    );
+
+    await this.checkoutPage!.continue();
+  }
+);
+
+Then(
+  'uma mensagem informando que o CEP é obrigatório deve ser exibida',
+  async function (this: E2EWorld) {
+
+    await expect(
+      this.checkoutPage!.errorMessage
+    ).toHaveText(
+      'Error: Postal Code is required'
+    );
+  }
+);
+
+Then(
+  'o produto selecionado deve estar presente no resumo do pedido',
+  async function (this: E2EWorld) {
+
+    await expect(
+      this.checkoutPage!.summaryItemNames
+    ).toContainText([
+      products.backpackName
+    ]);
+  }
+);
+
+Then(
+  'subtotal, imposto e total devem ser exibidos corretamente',
+  async function (this: E2EWorld) {
+
+    await expect(this.checkoutPage!.subtotalLabel).toBeVisible();
+    await expect(this.checkoutPage!.taxLabel).toBeVisible();
+    await expect(this.checkoutPage!.totalLabel).toBeVisible();
+
+    const subtotalText = await this.checkoutPage!.subtotalLabel.innerText();
+    const taxText = await this.checkoutPage!.taxLabel.innerText();
+    const totalText = await this.checkoutPage!.totalLabel.innerText();
+
+    const subtotal = extractCurrencyValue(subtotalText);
+    const tax = extractCurrencyValue(taxText);
+    const total = extractCurrencyValue(totalText);
+
+    expect(subtotal).toBeGreaterThan(0);
+    expect(tax).toBeGreaterThanOrEqual(0);
+    expect(total).toBeCloseTo(subtotal + tax, 2);
   }
 );
