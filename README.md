@@ -651,8 +651,3 @@ Essa decisão evita alterar a expectativa do teste apenas para seguir uma conven
 - Detalhes do E2E: [`tests/e2e/README.md`](./tests/e2e/README.md)
 - Performance: [`tests/performance/README.md`](./tests/performance/README.md)
 - Resultado de performance: [`tests/performance/RESULTADO.md`](./tests/performance/RESULTADO.md)
-- Resumo para apresentação técnica: [`RESUMO_IMPLEMENTACAO_AUTOMACAO.md`](./RESUMO_IMPLEMENTACAO_AUTOMACAO.md)
-
-## Escopo não implementado
-
-A frente de **automação mobile** não foi implementada. Ela é opcional na avaliação e foi conscientemente excluída para manter o foco nas três frentes entregues: **API, E2E e Performance**.
