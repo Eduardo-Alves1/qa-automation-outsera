@@ -1,6 +1,6 @@
 # E2E Automation
 
-Estrutura inicial da automacao E2E utilizando SauceDemo como aplicacao de teste.
+Automação E2E da aplicação **SauceDemo** utilizando **Cucumber.js + Playwright + TypeScript**, com cenários BDD em português, Page Object Pattern, evidências de falha e integração com Allure.
 
 ## Estrutura
 
@@ -8,15 +8,18 @@ Estrutura inicial da automacao E2E utilizando SauceDemo como aplicacao de teste.
 tests/e2e/
 ├── features/
 │   ├── login.feature
-│   └── checkout.feature
+│   ├── checkout.feature
+│   └── menu.feature
 ├── pages/
 │   ├── LoginPage.ts
 │   ├── InventoryPage.ts
 │   ├── CartPage.ts
-│   └── CheckoutPage.ts
+│   ├── CheckoutPage.ts
+│   └── MenuPage.ts
 ├── steps/
 │   ├── login.steps.ts
-│   └── checkout.steps.ts
+│   ├── checkout.steps.ts
+│   └── menu.steps.ts
 ├── support/
 │   ├── hooks.ts
 │   └── world.ts
@@ -26,18 +29,66 @@ tests/e2e/
 
 ## Responsabilidades
 
-- `features`: cenarios BDD escritos em Gherkin.
-- `pages`: Page Objects que encapsulam elementos e acoes da interface.
-- `steps`: definicoes Cucumber que conectarao os passos Gherkin aos Page Objects.
-- `support`: ciclo de vida do browser, contexto, pagina e World do Cucumber.
-- `data`: usuarios, dados de checkout e produtos utilizados pelos cenarios.
+- `features`: cenários BDD escritos em Gherkin com `# language: pt`;
+- `pages`: Page Objects que encapsulam locators e ações da interface;
+- `steps`: definições Cucumber que conectam Gherkin aos Page Objects;
+- `support`: ciclo de vida do browser, World e captura de evidências;
+- `data`: usuários, produto e dados de checkout.
 
-## Estado atual
+## Cobertura
 
-A estrutura, os cenarios Gherkin, os Page Objects e as massas iniciais ja estao criados. Os arquivos de steps e hooks permanecem como placeholders ate a integracao de `@cucumber/cucumber` e do runtime TypeScript, que sera realizada na proxima etapa.
+### Login
 
-A URL da aplicacao deve ser configurada por meio de:
+- credenciais válidas;
+- credenciais inválidas;
+- usuário ausente;
+- senha ausente;
+- usuário bloqueado.
+
+### Checkout
+
+- fluxo completo de compra;
+- campos obrigatórios ausentes;
+- nome, sobrenome ou CEP ausente;
+- produto presente no resumo;
+- consistência entre subtotal, imposto e total.
+
+### Menu
+
+- logout;
+- reset do estado da aplicação;
+- navegação para `All Items`.
+
+## Configuração
 
 ```env
 E2E_BASE_URL=https://www.saucedemo.com
 ```
+
+## Execução
+
+```bash
+npm run test:e2e
+```
+
+Execuções segmentadas:
+
+```bash
+npm run test:e2e:login
+npm run test:e2e:checkout
+npm run test:e2e:menu
+npm run test:e2e:smoke
+npm run test:e2e:regression
+```
+
+## Browser e estabilidade
+
+Cada cenário cria um novo BrowserContext no hook `Before` e libera os recursos no `After`, reduzindo dependência entre cenários.
+
+Localmente o Chromium é executado de forma visível com `slowMo`; no GitHub Actions, `CI=true` utiliza execução headless e sem atraso.
+
+Quando um cenário falha, o hook `After` captura screenshot e anexa a evidência ao Cucumber/Allure.
+
+## Relatório
+
+O formatter `allure-cucumberjs/reporter`, configurado em `cucumber.cjs`, grava os resultados em `allure-results/`. Esses resultados são combinados com os testes de API no relatório Allure unificado do pipeline.
