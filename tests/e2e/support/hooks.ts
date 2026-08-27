@@ -14,6 +14,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
+import { MenuPage } from '../pages/MenuPage';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ Before(async function (this: E2EWorld) {
   this.inventoryPage = new InventoryPage(this.page);
   this.cartPage = new CartPage(this.page);
   this.checkoutPage = new CheckoutPage(this.page);
+  this.menuPage = new MenuPage(this.page);
 });
 
 After(async function (this: E2EWorld, scenario) {
