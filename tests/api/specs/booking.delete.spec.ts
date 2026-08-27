@@ -82,7 +82,7 @@ test.describe(
                 const responseBody =
                     await response.text();
 
-                expect(responseBody).toBe('');
+                expect(responseBody).toBe('Created');
 
                 // Verifica o efeito da operação por consulta posterior.
                 const getResponse =
