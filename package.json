@@ -1,10 +1,11 @@
 {
   "name": "qa-automation-outsera",
   "version": "1.0.0",
-  "description": "",
+  "description": "QA automation assessment with Playwright, Cucumber, Allure and GitHub Actions",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test",
+    "test": "npm run test:all",
+    "test:all": "npm run test:api && npm run test:e2e",
     "test:api": "playwright test tests/api",
     "test:api:smoke": "playwright test tests/api --grep \"@smoke\"",
     "test:api:regression": "playwright test tests/api --grep \"@regression\"",
@@ -23,11 +24,19 @@
     "test:e2e:regression": "cucumber-js --config cucumber.cjs --tags \"@regression\"",
     "test:api:report": "playwright show-report",
     "report": "playwright show-report",
-    "allure:generate": "allure generate allure-results -o allure-report",
-    "allure:open": "allure open allure-report"
+    "allure:clean": "node -e \"const fs=require('fs'); ['allure-results','allure-report'].forEach(p=>fs.rmSync(p,{recursive:true,force:true}))\"",
+    "allure:generate": "allure generate allure-results -o allure-report --clean",
+    "allure:open": "allure open allure-report",
+    "test:allure": "npm run allure:clean && npm run test:api && npm run test:e2e && npm run allure:generate"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "qa",
+    "playwright",
+    "cucumber",
+    "allure",
+    "automation"
+  ],
+  "author": "Eduardo Alves",
   "license": "ISC",
   "devDependencies": {
     "@cucumber/cucumber": "^13.2.1",
