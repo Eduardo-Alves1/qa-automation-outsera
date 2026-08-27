@@ -2,7 +2,6 @@ export const e2eUsers = {
   standard: {
     username: 'standard_user',
     password: 'secret_sauce'
-
   },
   invalid: {
     username: 'invalid_user',
@@ -23,5 +22,6 @@ export const checkoutData = {
 } as const;
 
 export const products = {
-  backpack: 'sauce-labs-backpack'
+  backpack: 'sauce-labs-backpack',
+  backpackName: 'Sauce Labs Backpack'
 } as const;
