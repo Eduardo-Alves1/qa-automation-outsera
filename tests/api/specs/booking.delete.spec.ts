@@ -6,7 +6,6 @@ import { createValidAuthData } from '../data/auth.data';
 import type { CreateBookingResponse } from '../models/booking.model';
 import type { AuthResponse } from '../models/auth.model';
 
-
 test.describe(
     'Booking API - DELETE',
     {
@@ -76,7 +75,16 @@ test.describe(
 
                 expect(response.status()).toBe(201);
 
-                // Verificação se a reserva foi realmente deletada
+                expect(
+                    response.headers()['content-type']
+                ).toContain('text/plain');
+
+                const responseBody =
+                    await response.text();
+
+                expect(responseBody).toBe('');
+
+                // Verifica o efeito da operação por consulta posterior.
                 const getResponse =
                     await bookingClient.getBookingById(
                         bookingId
