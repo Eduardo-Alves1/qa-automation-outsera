@@ -1,57 +1,45 @@
-import { Booking } from '../models/booking.model';
+import type {
+  Booking,
+  BookingDates
+} from '../models/booking.model';
 
-export function createValidBookingDataModel(): Booking {
-    return {
-        firstname: 'Eduardo',
-        lastname: 'Alves',
-        totalprice: 150,
-        depositpaid: true,
-        bookingdates: {
-            checkin: '2023-01-01',
-            checkout: '2023-01-02'
-        },
-        additionalneeds: 'Café da manhã'
-    };
+type BookingOverrides = Omit<Partial<Booking>, 'bookingdates'> & {
+  bookingdates?: Partial<BookingDates>;
+};
+
+function formatDate(date: Date): string {
+  return date.toISOString().split('T')[0];
 }
 
-export function createUpdatedBookingDataModel(): Booking {
-    return {
-        firstname: 'Eduardo',
-        lastname: 'Alves',
-        totalprice: 200,
-        depositpaid: true,
-        bookingdates: {
-            checkin: '2023-01-01',
-            checkout: '2023-01-02'
-        },
-        additionalneeds: 'Almoço'
-    };
+function dateFromToday(days: number): string {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return formatDate(date);
 }
 
-//cada teste receberá um novo objeto e depois poderemos sobrescrever campos facilmente para cenários negativos.
-export function createBookingDataWithoutFirstname(): Partial<Booking> {
-    return {
-        lastname: 'Alves',
-        totalprice: 150,
-        depositpaid: true,
-        bookingdates: {
-            checkin: '2023-01-01',
-            checkout: '2023-01-02'
-        },
-        additionalneeds: 'Café da manhã'
-    };
-}
+export function createBookingData(
+  overrides: BookingOverrides = {}
+): Booking {
+  const suffix = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
-export function createBookingDataWithoutBookingDates(): Partial<Booking> {
-    return {
-        firstname: 'Eduardo',
-        lastname: 'Alves',
-        totalprice: 150,
-        depositpaid: true,
-        additionalneeds: 'Café da manhã'
-    };
-}
+  const booking: Booking = {
+    firstname: `Test${suffix.slice(-6)}`,
+    lastname: `User${suffix.slice(-6)}`,
+    totalprice: Math.floor(Math.random() * 401) + 100,
+    depositpaid: true,
+    bookingdates: {
+      checkin: dateFromToday(10),
+      checkout: dateFromToday(15)
+    },
+    additionalneeds: `Automation ${suffix.slice(-6)}`
+  };
 
-export function createEmptyBookingData(): Partial<Booking> {
-    return {};
+  return {
+    ...booking,
+    ...overrides,
+    bookingdates: {
+      ...booking.bookingdates,
+      ...overrides.bookingdates
+    }
+  };
 }

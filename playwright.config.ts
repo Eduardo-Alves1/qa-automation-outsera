@@ -1,17 +1,17 @@
 import { defineConfig } from '@playwright/test';
-import dotenv from 'dotenv';
 import os from 'node:os';
-
-dotenv.config();
+import {
+  environmentConfig,
+  testEnvironment
+} from './config/environments';
 
 export default defineConfig({
-
   testDir: './tests',
 
   timeout: 30_000,
 
   expect: {
-    timeout: 5_000,
+    timeout: 5_000
   },
 
   fullyParallel: true,
@@ -27,22 +27,22 @@ export default defineConfig({
       {
         resultsDir: 'allure-results',
         environmentInfo: {
+          test_environment: testEnvironment,
           os_platform: os.platform(),
           os_release: os.release(),
           node_version: process.version,
-          baseUrl: process.env.BASE_API_URL,
-          playwright_version: process.env.PLAYWRIGHT_VERSION,
+          base_url: environmentConfig.api.baseUrl
         }
       }
     ]
   ],
 
   use: {
-    baseURL: process.env.BASE_API_URL,
+    baseURL: environmentConfig.api.baseUrl,
     extraHTTPHeaders: {
       Accept: 'application/json',
       'Content-Type': 'application/json'
     },
-    trace: 'retain-on-failure',
+    trace: 'retain-on-failure'
   }
 });

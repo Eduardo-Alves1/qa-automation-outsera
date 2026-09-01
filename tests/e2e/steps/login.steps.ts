@@ -1,20 +1,22 @@
 import { Given, When, Then } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
+import { environmentConfig } from '../../../config/environments';
 import { E2EWorld } from '../support/world';
 import { e2eUsers } from '../data/users.data';
+
+async function expectLoginPage(world: E2EWorld): Promise<void> {
+  await expect(world.page!).not.toHaveURL(/inventory\.html/);
+  await expect(world.loginPage!.loginLogo).toHaveText('Swag Labs');
+  await expect(world.loginPage!.usernameInput).toBeVisible();
+  await expect(world.loginPage!.passwordInput).toBeVisible();
+  await expect(world.loginPage!.loginButton).toBeVisible();
+}
 
 Given(
   'que o usuário está na página de login do SauceDemo',
   async function (this: E2EWorld) {
-    const baseUrl = process.env.E2E_BASE_URL;
-
-    if (!baseUrl) {
-      throw new Error(
-        'A variável E2E_BASE_URL não está configurada.'
-      );
-    }
-
-    await this.loginPage!.open(baseUrl);
+    await this.loginPage!.open(environmentConfig.e2e.baseUrl);
+    await expectLoginPage(this);
   }
 );
 
@@ -31,9 +33,11 @@ When(
 Then(
   'a página de produtos deve ser exibida',
   async function (this: E2EWorld) {
-    await expect(
-      this.inventoryPage!.title
-    ).toHaveText('Products');
+    await expect(this.page!).toHaveURL(/\/inventory\.html$/);
+    await expect(this.inventoryPage!.title).toHaveText('Products');
+    await expect(this.inventoryPage!.inventoryList).toBeVisible();
+    await expect(this.inventoryPage!.cartLink).toBeVisible();
+    await expect(this.loginPage!.loginButton).toBeHidden();
   }
 );
 
@@ -50,47 +54,33 @@ When(
 Then(
   'uma mensagem de erro de login deve ser exibida',
   async function (this: E2EWorld) {
-    await expect(
-      this.loginPage!.errorMessage
-    ).toBeVisible();
-  }
-);
-
-When(
-  'o usuário tenta realizar o login sem informar o usuário',
-  async function (this: E2EWorld) {
-    await this.loginPage!.login(
-      '',
-      e2eUsers.standard.password
+    await expectLoginPage(this);
+    await expect(this.loginPage!.errorMessage).toHaveText(
+      'Epic sadface: Username and password do not match any user in this service'
     );
   }
 );
 
-Then(
-  'uma mensagem informando que o usuário é obrigatório deve ser exibida',
-  async function (this: E2EWorld) {
-    await expect(
-      this.loginPage!.errorMessage
-    ).toHaveText('Epic sadface: Username is required');
-  }
-);
-
 When(
-  'o usuário tenta realizar o login sem informar a senha',
-  async function (this: E2EWorld) {
-    await this.loginPage!.login(
-      e2eUsers.standard.username,
-      ''
-    );
+  'o usuário tenta realizar o login sem informar {string}',
+  async function (this: E2EWorld, field: string) {
+    const username = field === 'usuário'
+      ? ''
+      : e2eUsers.standard.username;
+
+    const password = field === 'senha'
+      ? ''
+      : e2eUsers.standard.password;
+
+    await this.loginPage!.login(username, password);
   }
 );
 
 Then(
-  'uma mensagem informando que a senha é obrigatória deve ser exibida',
-  async function (this: E2EWorld) {
-    await expect(
-      this.loginPage!.errorMessage
-    ).toHaveText('Epic sadface: Password is required');
+  'a mensagem de validação de login {string} deve ser exibida',
+  async function (this: E2EWorld, message: string) {
+    await expectLoginPage(this);
+    await expect(this.loginPage!.errorMessage).toHaveText(message);
   }
 );
 
@@ -107,9 +97,8 @@ When(
 Then(
   'uma mensagem informando que o usuário está bloqueado deve ser exibida',
   async function (this: E2EWorld) {
-    await expect(
-      this.loginPage!.errorMessage
-    ).toHaveText(
+    await expectLoginPage(this);
+    await expect(this.loginPage!.errorMessage).toHaveText(
       'Epic sadface: Sorry, this user has been locked out.'
     );
   }

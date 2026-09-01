@@ -1,82 +1,39 @@
 # QA Automation Outsera
 
-Projeto de automação de testes desenvolvido para uma avaliação técnica, cobrindo três frentes: **API**, **End-to-End (E2E)** e **Performance**. A solução utiliza **Playwright + TypeScript**, **Cucumber.js**, **K6**, **Allure Report** e **GitHub Actions**, com separação de responsabilidades, cenários positivos e negativos, evidências e execução automatizada.
+Projeto desenvolvido para uma avaliação técnica de automação de testes, cobrindo **API**, **E2E**, **CI/CD** e **Performance**.
 
-O projeto foi estruturado como uma entrega próxima de um cenário real de produção, priorizando legibilidade, isolamento dos testes, configuração externa, rastreabilidade, relatórios e execução em CI/CD.
+A solução utiliza **Playwright + TypeScript**, **Cucumber.js**, **K6**, **Allure Report** e **GitHub Actions**. A estrutura foi organizada pensando em manutenção, reutilização, execução em mais de um ambiente e crescimento da suíte.
 
-> **Mobile não foi implementado.** A própria avaliação classifica essa frente como opcional, e ela foi intencionalmente deixada fora do escopo desta entrega.
+> A automação **Mobile** não foi implementada por ser um item opcional da avaliação.
 
-## Atendimento à avaliação
+## Escopo entregue
 
-| Requisito | Status | Implementação |
-|---|---|---|
-| API — status code, headers e body | ✅ | Playwright Test |
-| API — cenários positivos e negativos | ✅ | Auth e Booking |
-| API — GET, POST, PUT e DELETE | ✅ | Restful Booker |
-| API — dados ausentes | ✅ | Cenários negativos |
-| API — autenticação inválida | ✅ | Auth, PUT e DELETE |
-| API — payload JSON malformado | ✅ | POST `/booking` |
-| API — método HTTP inválido | ✅ | POST indevido em `/booking/{id}` |
-| API — relatório detalhado | ✅ | Allure Report |
-| E2E — Cucumber + Playwright | ✅ | SauceDemo |
-| E2E — login positivo e negativo | ✅ | Gherkin + Page Objects |
-| E2E — campos obrigatórios | ✅ | Login e Checkout |
-| E2E — navegação | ✅ | Produtos, carrinho e menu |
-| E2E — checkout positivo e negativo | ✅ | Carrinho, dados do cliente e finalização |
-| E2E — Page Object Pattern | ✅ | `tests/e2e/pages` |
-| E2E — evidências em falha | ✅ | Screenshot anexado ao Allure |
-| CI/CD — execução de API e E2E após commits | ✅ | GitHub Actions |
-| CI/CD — relatório das execuções | ✅ | Allure unificado como artifact |
-| Performance — K6 | ✅ | Perfil progressivo e perfil constante |
-| Performance — métricas e thresholds | ✅ | p95, p99, falhas, checks e throughput |
-| Performance — relatório e análise | ✅ | `tests/performance/RESULTADO.md` + HTML exportável |
-| Performance — configuração 500 VUs / 5 min | ⚙️ Suportada | Perfil `constant`, para ambiente autorizado |
-| Mobile | ⏭️ Fora do escopo | Item opcional da avaliação |
+| Frente | Cobertura |
+|---|---|
+| API | GET, POST, PUT, DELETE, status, headers, body, positivos e negativos |
+| E2E | Login, navegação, carrinho, checkout, negativos e Page Object Pattern |
+| Relatórios | Allure para API e E2E, screenshot em falha e artifacts no GitHub Actions |
+| CI/CD | Typecheck, smoke em PR e regressão em `main` |
+| Performance | K6 com carga progressiva, thresholds e perfil constante parametrizável |
+| Mobile | Fora do escopo |
 
-## Tecnologias e versões
+## Tecnologias
 
-| Tecnologia | Versão / configuração | Finalidade |
-|---|---:|---|
-| Node.js | 24.x | Runtime JavaScript |
-| TypeScript | ^7.0.2 | Linguagem e tipagem estática |
-| Playwright Test | ^1.62.1 | Automação de API e browser |
-| Cucumber.js | ^13.2.1 | BDD e execução E2E |
-| @cucumber/messages | ^34.2.0 | Mensagens do runtime Cucumber |
-| Allure | ^3.16.0 | Geração do relatório |
-| allure-playwright | ^3.11.0 | Playwright Test + Allure |
-| allure-cucumberjs | ^3.11.0 | Cucumber.js + Allure |
-| tsx | ^4.23.12 | Execução TypeScript no Cucumber |
-| dotenv | ^17.4.2 | Variáveis de ambiente |
-| K6 | CLI externo | Testes de performance |
-| GitHub Actions | `actions/*@v4` e Grafana K6 Action | CI/CD |
+| Tecnologia | Versão / uso |
+|---|---|
+| Node.js | 24.x |
+| TypeScript | ^7.0.2 |
+| Playwright Test | ^1.62.1 |
+| Cucumber.js | ^13.2.1 |
+| Allure | ^3.16.0 |
+| allure-playwright | ^3.11.0 |
+| allure-cucumberjs | ^3.11.0 |
+| K6 | CLI externo |
+| GitHub Actions | CI/CD |
 
-As dependências Node estão registradas em `package.json` e `package-lock.json`. A versão do binário K6 instalado no ambiente pode ser consultada com:
+As versões das dependências Node estão registradas em `package.json` e `package-lock.json`.
 
-```bash
-k6 version
-```
-
-## Aplicações utilizadas
-
-### API — Restful Booker
-
-```env
-BASE_API_URL=https://restful-booker.herokuapp.com
-```
-
-A API foi utilizada para autenticação, CRUD de reservas e performance controlada.
-
-### E2E — SauceDemo
-
-```env
-E2E_BASE_URL=https://www.saucedemo.com
-```
-
-O SauceDemo foi utilizado para login, navegação, carrinho, checkout e menu lateral.
-
-> **Limitação do checkout:** o SauceDemo não disponibiliza formulário real de cartão/pagamento. Por isso, os cenários negativos foram aplicados aos campos efetivamente disponibilizados pela aplicação — nome, sobrenome e CEP — mantendo a intenção da avaliação de validar dados obrigatórios e falhas esperadas.
-
-## Arquitetura do projeto
+## Arquitetura
 
 ```text
 qa-automation-outsera/
@@ -84,6 +41,9 @@ qa-automation-outsera/
 │   └── workflows/
 │       ├── api-tests.yml
 │       └── performance-tests.yml
+│
+├── config/
+│   └── environments.ts
 │
 ├── tests/
 │   ├── api/
@@ -97,28 +57,15 @@ qa-automation-outsera/
 │   │   │   ├── auth.model.ts
 │   │   │   └── booking.model.ts
 │   │   └── specs/
-│   │       └── *.spec.ts
+│   │       ├── auth.spec.ts
+│   │       └── booking.spec.ts
 │   │
 │   ├── e2e/
 │   │   ├── data/
-│   │   │   └── users.data.ts
 │   │   ├── features/
-│   │   │   ├── login.feature
-│   │   │   ├── checkout.feature
-│   │   │   └── menu.feature
 │   │   ├── pages/
-│   │   │   ├── LoginPage.ts
-│   │   │   ├── InventoryPage.ts
-│   │   │   ├── CartPage.ts
-│   │   │   ├── CheckoutPage.ts
-│   │   │   └── MenuPage.ts
 │   │   ├── steps/
-│   │   │   ├── login.steps.ts
-│   │   │   ├── checkout.steps.ts
-│   │   │   └── menu.steps.ts
 │   │   └── support/
-│   │       ├── hooks.ts
-│   │       └── world.ts
 │   │
 │   └── performance/
 │       ├── load-test.js
@@ -129,129 +76,133 @@ qa-automation-outsera/
 ├── casos-de-teste.md
 ├── cucumber.cjs
 ├── playwright.config.ts
-├── tsconfig.json
 ├── package.json
-├── package-lock.json
-├── RESUMO_IMPLEMENTACAO_AUTOMACAO.md
-└── README.md
+└── tsconfig.json
 ```
 
-## Padrões e decisões de arquitetura
+# Configuração de ambientes
 
-### API
+O projeto aceita três ambientes:
 
-A camada de API foi dividida em responsabilidades:
+```text
+dev
+hml
+qa
+```
 
-| Camada | Responsabilidade |
-|---|---|
-| `clients` | encapsula endpoints e chamadas HTTP |
-| `data` | cria massas válidas, inválidas e incompletas |
-| `models` | define contratos TypeScript |
-| `specs` | concentra cenários, pré-condições e assertions |
+A seleção é feita por:
 
-Essa divisão reduz duplicação e evita misturar construção de payload, acesso HTTP e regras de validação dentro do mesmo bloco de teste.
+```env
+TEST_ENV=dev
+```
 
-### E2E
+As configurações são centralizadas em `config/environments.ts`. Cada ambiente possui URL e credenciais próprias para API e E2E.
 
-A automação web aplica **BDD + Page Object Pattern**:
+Neste desafio os três ambientes podem apontar para as mesmas aplicações públicas; a separação existe para demonstrar como a estrutura se comportaria quando DEV, HML e QA possuíssem endpoints ou usuários diferentes.
 
-| Camada | Responsabilidade |
-|---|---|
-| `features` | comportamento em Gherkin, escrito em português |
-| `pages` | locators e ações de página |
-| `steps` | ligação entre Gherkin e Page Objects |
-| `data` | usuários, produtos e dados de checkout |
-| `support/world.ts` | contexto compartilhado do cenário |
-| `support/hooks.ts` | criação/encerramento do browser e evidências |
+Exemplo de variáveis:
 
-Cada cenário recebe seu próprio contexto de browser, reduzindo dependência entre testes. Em falhas, o `After` captura screenshot e anexa a evidência ao Cucumber/Allure.
+```env
+TEST_ENV=dev
 
-### Performance
+DEV_API_URL=https://restful-booker.herokuapp.com
+DEV_API_USERNAME=admin
+DEV_API_PASSWORD=password123
+DEV_E2E_URL=https://www.saucedemo.com
+DEV_E2E_STANDARD_USERNAME=standard_user
+DEV_E2E_STANDARD_PASSWORD=secret_sauce
+```
 
-A frente de performance é independente das suítes funcionais e utiliza K6 com:
+O `.env.example` contém o mapeamento completo de `dev`, `hml` e `qa`.
 
-- perfil progressivo (`ramping-vus`);
-- perfil constante (`constant-vus`);
-- parâmetros via variáveis de ambiente;
-- checks funcionais durante a carga;
-- thresholds para erro e latência;
-- think time de 1 segundo;
-- relatório HTML e resumo JSON exportáveis.
+Para trocar o ambiente em Linux/WSL:
 
-## Pré-requisitos
+```bash
+TEST_ENV=hml npm run test:api
+TEST_ENV=qa npm run test:e2e
+```
 
-Para API e E2E:
+No GitHub Actions, a execução manual também permite selecionar o ambiente.
 
-- Node.js 20 ou superior — recomendado 24.x;
+# Instalação
+
+Pré-requisitos:
+
+- Node.js 20 ou superior, recomendado 24.x;
 - npm;
 - Git;
-- Chromium do Playwright.
+- K6 para a suíte de performance.
 
-Para performance:
-
-- K6 instalado no ambiente.
-
-Documentação oficial de instalação do K6: https://grafana.com/docs/k6/latest/set-up/install-k6/
-
-## Instalação
-
-Clone o projeto:
+Clone o projeto e instale as dependências:
 
 ```bash
 git clone git@github.com:Eduardo-Alves1/qa-automation-outsera.git
 cd qa-automation-outsera
-```
-
-Instale as dependências Node:
-
-```bash
 npm install
 ```
 
-Em CI, o projeto utiliza instalação reproduzível com:
-
-```bash
-npm ci
-```
-
-Instale o Chromium e as dependências necessárias ao E2E:
-
-```bash
-npx playwright install --with-deps chromium
-```
-
-## Configuração do ambiente
-
-Crie o `.env` a partir do arquivo de exemplo:
+Crie o arquivo local de configuração:
 
 ```bash
 cp .env.example .env
 ```
 
-Conteúdo esperado:
+Instale o Chromium usado pelo E2E:
 
-```env
-BASE_API_URL=https://restful-booker.herokuapp.com
-E2E_BASE_URL=https://www.saucedemo.com
+```bash
+npx playwright install --with-deps chromium
 ```
 
-O `.env` é ignorado pelo Git e não deve ser versionado.
-
-## Validação TypeScript
+Valide a tipagem:
 
 ```bash
 npx tsc --noEmit
 ```
 
-O projeto utiliza TypeScript em modo `strict`. Essa validação também é executada no início do pipeline.
+# API - Playwright + TypeScript
 
-# Testes de API
+A automação usa a Restful Booker.
+
+## Organização
+
+A suíte foi separada por responsabilidade:
+
+| Camada | Responsabilidade |
+|---|---|
+| `clients` | chamadas HTTP e endpoints |
+| `data` | factories e massas de teste |
+| `models` | contratos TypeScript |
+| `specs` | cenários e assertions |
+
+Os specs foram consolidados por **recurso**, evitando um arquivo para cada combinação de verbo e cenário:
+
+```text
+auth.spec.ts
+booking.spec.ts
+```
+
+Dentro de `booking.spec.ts`, `test.describe` separa `GET`, `POST`, `PUT` e `DELETE`.
+
+## Factory de Booking
+
+`createBookingData()` gera uma reserva nova a cada chamada, incluindo nome, preço, datas e observação.
+
+Quando um cenário precisa de alguma informação específica, utiliza **overrides**:
+
+```ts
+const booking = createBookingData({
+  totalprice: 450,
+  additionalneeds: 'Updated booking'
+});
+```
+
+Dessa forma não é necessário manter uma função para cada variação do mesmo payload.
 
 ## Cobertura
 
-### Autenticação
+### Auth
 
-- criação de token com credenciais válidas;
+- token válido;
 - credenciais inválidas;
 - username ausente;
 - password ausente;
@@ -259,32 +210,29 @@ O projeto utiliza TypeScript em modo `strict`. Essa validação também é execu
 
 ### Booking
 
-- listar reservas;
-- consultar reserva por ID;
-- consultar ID inexistente;
-- criar reserva;
-- payload com campos obrigatórios ausentes;
+- `GET /booking`;
+- `GET /booking/{id}` positivo e negativo;
+- `POST /booking` positivo;
+- campos ausentes;
 - body vazio;
 - JSON malformado;
-- atualizar com autenticação válida;
-- atualizar sem token;
-- atualizar com token inválido;
-- verificar persistência após `PUT`;
-- excluir com autenticação válida;
-- excluir sem token;
-- excluir com token inválido;
-- verificar exclusão por `GET` posterior;
-- método HTTP não suportado em `/booking/{id}`.
+- método HTTP não suportado;
+- `PUT` com token válido, ausente e inválido;
+- confirmação da persistência por GET;
+- `DELETE` com token válido, ausente e inválido;
+- confirmação da exclusão por GET posterior.
 
-Os fluxos positivos de `GET`, `POST`, `PUT` e `DELETE` validam o contrato aplicável de **status code, headers e body**. Para o `DELETE`, o contrato observado retorna HTTP `201`, `Content-Type: text/plain` e body `Created`; a exclusão também é comprovada por consulta posterior.
+Os fluxos positivos validam **status code, headers e body** conforme o contrato observado da API.
 
-## Execução
+Os casos estão resumidos em [`casos-de-teste.md`](./casos-de-teste.md).
+
+## Execução API
 
 ```bash
 npm run test:api
 ```
 
-Execuções segmentadas:
+Filtros disponíveis:
 
 ```bash
 npm run test:api:smoke
@@ -298,49 +246,69 @@ npm run test:api:put
 npm run test:api:delete
 ```
 
-Os casos de teste funcionais da API estão documentados em:
+# E2E - Cucumber + Playwright
 
-[`casos-de-teste.md`](./casos-de-teste.md)
+O E2E utiliza o SauceDemo e combina **BDD + Page Object Pattern**.
 
-# Testes E2E
+## Organização
 
-Os cenários utilizam Cucumber com `# language: pt` e Playwright para interação com o browser.
+| Pasta | Responsabilidade |
+|---|---|
+| `features` | cenários Gherkin em português |
+| `pages` | locators e ações da interface |
+| `steps` | ligação entre Gherkin e Page Objects |
+| `data` | usuários, produto e factory de checkout |
+| `support` | World, hooks e ciclo de vida do browser |
 
-## Login
+## Cenários
 
-- login válido;
+### Login
+
+- autenticação válida;
 - credenciais inválidas;
-- usuário obrigatório;
-- senha obrigatória;
+- campos obrigatórios por `Scenario Outline`;
 - usuário bloqueado.
 
-## Checkout
+### Checkout
 
-- adicionar produto ao carrinho;
-- acessar o carrinho;
-- iniciar checkout;
-- concluir compra com dados válidos;
-- impedir checkout sem dados obrigatórios;
-- nome ausente;
-- sobrenome ausente;
-- CEP ausente;
-- validar produto no resumo;
-- validar subtotal, imposto e total.
+- produto no carrinho;
+- dados do produto, preço e quantidade;
+- checkout com sucesso;
+- campos obrigatórios por `Scenario Outline`;
+- produto no resumo;
+- subtotal, imposto e total;
+- conclusão do pedido.
 
-## Navegação e menu
+### Navegação
 
 - logout;
-- reset do estado da aplicação;
-- navegação para `All Items`;
-- validação de retorno à página de produtos.
+- Reset App State;
+- All Items.
 
-## Execução
+Os cenários repetitivos de campos obrigatórios foram escritos com **Scenario Outline + Examples**, reduzindo duplicação na feature sem perder cobertura.
+
+## Validações E2E
+
+Os testes não verificam apenas visibilidade. Dependendo do fluxo também são validados:
+
+- URL após a ação;
+- título e estado da página;
+- mensagem exata de erro;
+- conteúdo do carrinho;
+- nome, preço e quantidade do produto;
+- subtotal, imposto e total;
+- estado da sessão após login/logout;
+- estado do carrinho após Reset App State e após conclusão do pedido.
+
+Em caso de falha, o hook `After` captura screenshot e anexa a evidência ao relatório.
+
+## Execução E2E
 
 ```bash
 npm run test:e2e
 ```
 
-Por funcionalidade ou suíte:
+Por grupo:
 
 ```bash
 npm run test:e2e:login
@@ -350,69 +318,78 @@ npm run test:e2e:smoke
 npm run test:e2e:regression
 ```
 
-Um cenário individual também pode ser executado pelo nome:
+Localmente o browser é visível com `slowMo`; no CI ele roda headless e sem atraso.
+
+# Relatório Allure
+
+API e E2E enviam seus resultados para:
+
+```text
+allure-results/
+```
+
+Executar as duas suítes e gerar o relatório:
 
 ```bash
-npx cucumber-js \
-  --config cucumber.cjs \
-  --name "Realizar login com credenciais válidas"
+npm run test:allure
 ```
 
-## Browser local e CI
+Abrir o relatório já gerado:
 
-O hook adapta a execução ao ambiente:
+```bash
+npm run allure:open
+```
+
+No GitHub Actions os resultados de API e E2E são combinados em um relatório único e publicados como artifact:
 
 ```text
-Local     → Chromium visível + slowMo
-CI=true   → headless + sem slowMo
+allure-automation-report-<run_number>
 ```
 
-Isso facilita depuração local sem aumentar desnecessariamente o tempo do pipeline.
+# CI/CD - GitHub Actions
 
-# Testes de Performance
-
-O teste utiliza o mesmo domínio de API funcional, executando:
+Workflow funcional:
 
 ```text
-GET /booking
+.github/workflows/api-tests.yml
 ```
 
-Cada iteração valida:
+Fluxo:
+
+```text
+TypeScript validation
+        |
+        +--> API
+        |
+        +--> E2E
+              |
+              v
+       Allure unificado
+```
+
+Comportamento:
+
+- Pull Request para `main`: smoke tests;
+- Push para `main`: regressão;
+- Execução manual: escolha de `smoke`, `regression` ou `all` e de `dev`, `hml` ou `qa`.
+
+# Performance - K6
+
+A frente de performance executa `GET /booking` e valida durante a carga:
 
 - HTTP `200`;
 - `Content-Type` JSON;
-- body como lista de reservas.
+- body como lista.
 
-## Perfil progressivo utilizado
+## Perfil progressivo
 
-O perfil padrão aumenta a concorrência em etapas:
+Perfil utilizado na execução demonstrativa:
 
 ```text
-5 → 10 → 15 → 20 → 25 VUs
+5 -> 10 -> 15 -> 20 -> 25 VUs
 ```
 
-Com 30 segundos de sustentação por nível, 10 segundos de ramp entre os níveis e ramp down ao final.
-
-Executar:
-
-```bash
-npm run test:performance
-```
-
-ou personalizar:
-
-```bash
-K6_PROFILE=ramp \
-K6_START_VUS=5 \
-K6_STEP_VUS=5 \
-K6_MAX_VUS=25 \
-K6_HOLD_DURATION=30s \
-K6_RAMP_DURATION=10s \
-K6_RAMP_DOWN_DURATION=20s \
-k6 run tests/performance/load-test.js
-```
-
-## Thresholds
+Thresholds:
 
 ```text
 http_req_failed < 5%
@@ -421,29 +398,25 @@ p99 < 3000 ms
 checks > 95%
 ```
 
-## Resultado real da execução progressiva
+Resultado da execução progressiva:
 
 | Métrica | Resultado |
 |---|---:|
-| Pico de VUs | 25 |
+| Pico | 25 VUs |
 | Requisições | 2.318 |
-| Checks | 6.954 / 6.954 — 100% |
+| Checks | 6.954 / 6.954 - 100% |
 | Falhas HTTP | 0,00% |
 | Throughput | 10,97 req/s |
-| Tempo médio | 333,11 ms |
+| Média | 333,11 ms |
 | p95 | 394,08 ms |
 | p99 | 396,91 ms |
 | Máximo | 681,78 ms |
 
-Todos os thresholds foram atendidos. Dentro da carga efetivamente testada, não foi identificado ponto de saturação ou gargalo crítico.
+A análise está em [`tests/performance/RESULTADO.md`](./tests/performance/RESULTADO.md).
 
-A análise completa, incluindo o baseline de 5 VUs, está em:
+## Perfil constante solicitado na avaliação
 
-[`tests/performance/RESULTADO.md`](./tests/performance/RESULTADO.md)
-
-## Configuração solicitada na avaliação — 500 VUs / 5 minutos
-
-O script também oferece perfil constante:
+O script aceita:
 
 ```bash
 K6_PROFILE=constant \
@@ -452,202 +425,41 @@ K6_DURATION=5m \
 k6 run tests/performance/load-test.js
 ```
 
-Essa configuração reproduz o formato solicitado pela avaliação, mas **não foi executada contra a Restful Booker pública**, pois se trata de um serviço compartilhado de terceiros. O perfil permanece disponível para execução pelo avaliador em ambiente autorizado.
+A configuração está disponível, porém **não foi executada contra a API pública compartilhada**. O perfil pode ser utilizado em ambiente autorizado pelo avaliador.
 
-## Relatório K6
-
-Para gerar dashboard HTML e resumo JSON:
-
-```bash
-mkdir -p performance-results
-
-K6_WEB_DASHBOARD=true \
-K6_WEB_DASHBOARD_OPEN=false \
-K6_WEB_DASHBOARD_EXPORT=performance-results/k6-report.html \
-k6 run \
-  --summary-export=performance-results/k6-summary.json \
-  tests/performance/load-test.js
-```
-
-Os resultados de execução não são versionados; `performance-results/` está no `.gitignore`.
-
-# Relatórios e evidências
-
-## Allure — API + E2E
-
-API e E2E escrevem resultados na mesma estrutura:
-
-```text
-allure-results/
-```
-
-Integrações:
-
-```text
-API → allure-playwright
-E2E → allure-cucumberjs/reporter
-```
-
-Para executar API + E2E e gerar relatório local:
-
-```bash
-npm run test:allure
-```
-
-Ou separadamente:
-
-```bash
-npm run allure:clean
-npm run test:api
-npm run test:e2e
-npm run allure:generate
-npm run allure:open
-```
-
-O relatório é criado em:
-
-```text
-allure-report/
-```
-
-### Evidência de falha E2E
-
-Quando um cenário Cucumber falha, o hook `After` captura um screenshot e o anexa à execução. O `allure-cucumberjs` inclui esse attachment no relatório.
-
-# CI/CD — GitHub Actions
-
-## Pipeline funcional
-
-Workflow:
-
-```text
-.github/workflows/api-tests.yml
-```
-
-Apesar do nome histórico do arquivo, ele executa API e E2E.
-
-### Pull Request para `main`
-
-```text
-TypeScript validation
-        │
-        ├───────────────┐
-        ▼               ▼
-   API Smoke        E2E Smoke
-        │               │
-        └───────┬───────┘
-                ▼
-       Allure unificado
-                ▼
-          GitHub Artifact
-```
-
-### Push para `main`
-
-```text
-TypeScript validation
-        │
-        ├───────────────────┐
-        ▼                   ▼
- API Regression       E2E Regression
-        │                   │
-        └─────────┬─────────┘
-                  ▼
-         Allure unificado
-                  ▼
-           GitHub Artifact
-```
-
-Também existe execução manual com `workflow_dispatch`, permitindo selecionar `smoke`, `regression` ou `all`.
-
-O job E2E instala Chromium e dependências de sistema automaticamente:
-
-```bash
-npx playwright install --with-deps chromium
-```
-
-Os resultados de API e E2E são enviados como artifacts separados, combinados no job final e publicados no artifact:
-
-```text
-allure-automation-report-<run_number>
-```
-
-## Pipeline de performance
-
-Workflow:
+O workflow de performance é manual:
 
 ```text
 .github/workflows/performance-tests.yml
 ```
 
-A execução é **manual**, evitando que testes de carga sejam disparados automaticamente a cada commit contra uma API pública. O avaliador pode escolher:
+Ele permite configurar perfil, VUs, duração e URL e publica o relatório K6 como artifact.
 
-- perfil `ramp` ou `constant`;
-- quantidade de VUs;
-- duração;
-- VUs iniciais e incremento;
-- tempos de ramp;
-- URL alvo.
+# Observações sobre as aplicações públicas
 
-Ao final, o workflow publica `k6-report.html` e `k6-summary.json` como artifact.
+A Restful Booker possui alguns comportamentos pouco convencionais que são respeitados pelos testes, por exemplo:
 
-# Estratégia de tags
+- autenticação inválida retorna HTTP `200` com `Bad credentials`;
+- exclusão bem-sucedida retorna HTTP `201` com body `Created`;
+- payloads inválidos específicos podem retornar HTTP `500`.
 
-## API
-
-```text
-@api @auth @booking
-@get @post @put @delete
-@positive @negative
-@smoke @regression
-```
-
-## E2E
-
-```text
-@e2e @login @checkout @menu
-@positive @negative
-@smoke @regression
-```
-
-As tags permitem executar subconjuntos adequados ao contexto, como smoke em Pull Requests e regressão em `main`.
-
-# Observações sobre o contrato da Restful Booker
-
-A automação valida o **contrato observado da API**, mesmo quando ele difere de convenções REST comuns. Exemplos:
-
-- autenticação inválida retorna HTTP `200` com `reason: "Bad credentials"`;
-- exclusão bem-sucedida retorna HTTP `201`;
-- determinados payloads inválidos podem retornar HTTP `500`;
-- JSON malformado é rejeitado com resposta de erro;
-- o efeito de `PUT` e `DELETE` é validado com consultas posteriores.
-
-Essa decisão evita alterar a expectativa do teste apenas para seguir uma convenção teórica diferente do comportamento real da API utilizada.
+O SauceDemo não possui formulário real de cartão. Por isso, os cenários negativos do checkout foram aplicados aos campos que a própria aplicação disponibiliza: nome, sobrenome e CEP.
 
 # Boas práticas aplicadas
 
+- configuração centralizada por ambiente;
 - TypeScript em modo `strict`;
-- Page Object Pattern no E2E;
+- API Clients;
+- Test Data Factory com overrides;
+- dados dinâmicos para reservas e checkout;
+- specs organizados por recurso;
 - BDD com Cucumber/Gherkin;
-- clients, models, data e specs separados na API;
-- massas reutilizáveis e criação dinâmica de reservas;
-- independência entre cenários;
-- validações de status, headers e body;
-- cenários positivos e negativos;
-- validação do efeito de operações de escrita;
-- variáveis de ambiente para URLs e configuração de carga;
-- screenshots automáticos em falha E2E;
-- tags de smoke, regressão, domínio e método HTTP;
-- Allure consolidado para API e E2E;
-- thresholds de performance;
-- CI/CD com validação TypeScript;
-- execução de performance isolada e sob demanda;
-- artifacts de relatórios e evidências;
-- arquivos gerados excluídos do versionamento.
-
-# Documentação complementar
-
-- Casos de teste da API: [`casos-de-teste.md`](./casos-de-teste.md)
-- Detalhes do E2E: [`tests/e2e/README.md`](./tests/e2e/README.md)
-- Performance: [`tests/performance/README.md`](./tests/performance/README.md)
-- Resultado de performance: [`tests/performance/RESULTADO.md`](./tests/performance/RESULTADO.md)
+- Scenario Outline para cenários repetitivos;
+- Page Object Pattern;
+- World isolado por cenário;
+- asserts de estado e dados de negócio;
+- tags de smoke, regressão, domínio e verbo;
+- screenshots automáticos em falha;
+- Allure unificado;
+- CI/CD e artifacts;
+- thresholds de performance.

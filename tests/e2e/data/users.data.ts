@@ -1,27 +1,37 @@
+import { environmentConfig } from '../../../config/environments';
+
+export type CheckoutData = {
+  firstName: string;
+  lastName: string;
+  postalCode: string;
+};
+
 export const e2eUsers = {
-  standard: {
-    username: 'standard_user',
-    password: 'secret_sauce'
-  },
+  standard: environmentConfig.e2e.standardUser,
   invalid: {
-    username: 'invalid_user',
-    password: 'invalid_password'
+    username: `invalid-user-${Date.now()}`,
+    password: `invalid-password-${Date.now()}`
   },
-  locked: {
-    username: 'locked_out_user',
-    password: 'secret_sauce'
-  }
+  locked: environmentConfig.e2e.lockedUser
 } as const;
 
-export const checkoutData = {
-  valid: {
-    firstName: 'Eduardo',
-    lastName: 'Alves',
-    postalCode: '06800-000'
-  }
-} as const;
+export function createCheckoutData(
+  overrides: Partial<CheckoutData> = {}
+): CheckoutData {
+  const suffix = `${Date.now()}`.slice(-6);
+
+  return {
+    firstName: `Test${suffix}`,
+    lastName: `User${suffix}`,
+    postalCode: `0${suffix}`,
+    ...overrides
+  };
+}
 
 export const products = {
-  backpack: 'sauce-labs-backpack',
-  backpackName: 'Sauce Labs Backpack'
+  backpack: {
+    slug: 'sauce-labs-backpack',
+    name: 'Sauce Labs Backpack',
+    price: 29.99
+  }
 } as const;

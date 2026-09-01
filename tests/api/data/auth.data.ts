@@ -1,31 +1,33 @@
-import { AuthRequest } from "../models/auth.model";
+import { environmentConfig } from '../../../config/environments';
+import type { AuthRequest } from '../models/auth.model';
 
 export function createValidAuthData(): AuthRequest {
-    return {
-        username: 'admin',
-        password: 'password123'
-    };
+  return {
+    ...environmentConfig.api.credentials
+  };
 }
 
 export function createInvalidAuthData(): AuthRequest {
-    return {
-        username: 'invalidUser',
-        password: 'wrongPassword'
-    };
+  const suffix = Date.now();
+
+  return {
+    username: `invalid-user-${suffix}`,
+    password: `invalid-password-${suffix}`
+  };
 }
 
 export function createAuthDataWithoutUsername(): Partial<AuthRequest> {
-    return {
-        password: 'password123'
-    };
+  return {
+    password: environmentConfig.api.credentials.password
+  };
 }
 
 export function createAuthDataWithoutPassword(): Partial<AuthRequest> {
-    return {
-        username: 'admin'
-    };
+  return {
+    username: environmentConfig.api.credentials.username
+  };
 }
 
 export function createEmptyAuthData(): Partial<AuthRequest> {
-    return {};
+  return {};
 }

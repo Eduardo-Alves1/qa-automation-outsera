@@ -15,9 +15,9 @@ import { InventoryPage } from '../pages/InventoryPage';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
 import { MenuPage } from '../pages/MenuPage';
+import type { CheckoutData } from '../data/users.data';
 
 export class E2EWorld extends World {
-
   browser?: Browser;
   context?: BrowserContext;
   page?: Page;
@@ -28,12 +28,13 @@ export class E2EWorld extends World {
   checkoutPage?: CheckoutPage;
   menuPage?: MenuPage;
 
+  checkoutData?: CheckoutData;
+
   constructor(options: IWorldOptions) {
     super(options);
   }
 
   async dispose(): Promise<void> {
-
     await this.context?.close();
     await this.browser?.close();
 
@@ -46,6 +47,7 @@ export class E2EWorld extends World {
     this.cartPage = undefined;
     this.checkoutPage = undefined;
     this.menuPage = undefined;
+    this.checkoutData = undefined;
   }
 }
 
