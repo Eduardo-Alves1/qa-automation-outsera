@@ -453,7 +453,8 @@ K6_VUS=500 \
 K6_DURATION=5m \
 k6 run tests/performance/load-test.js
 
-![alt text](image.png)
+<img width="599" height="453" alt="image" src="https://github.com/user-attachments/assets/60e2cf3f-8019-42e8-91f2-3ba86ac46da5" />
+
 ```
 
 Foi executado um teste de carga progressiva com K6, aumentando a concorrência até **500** usuários virtuais. Durante a execução foram realizadas aproximadamente 76 mil requisições, sem falhas HTTP e com 100% dos checks atendidos. O p95 ficou em aproximadamente 394 ms e o p99 em 401 ms, ambos significativamente abaixo dos thresholds definidos. Dentro do cenário executado, não foi identificado indício de degradação relevante até 500 VUs.
