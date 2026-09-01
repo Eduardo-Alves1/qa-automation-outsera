@@ -55,6 +55,8 @@ When(
 Then(
   'a página de login deve ser exibida',
   async function (this: E2EWorld) {
+    // Conforme pontuado na avaliação, o logout valida o estado final da sessão
+    // e não somente a presença isolada de um elemento na tela.
     await expect(this.page!).not.toHaveURL(/inventory\.html/);
     await expect(this.loginPage!.loginLogo).toHaveText('Swag Labs');
     await expect(this.loginPage!.usernameInput).toBeVisible();

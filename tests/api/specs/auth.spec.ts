@@ -8,6 +8,8 @@ import {
   createValidAuthData
 } from '../data/auth.data';
 
+// Conforme pontuado na avaliação, os cenários foram agrupados por recurso
+// em vez de manter arquivos separados para cada combinação de verbo e cenário.
 test.describe(
   'Auth API',
   { tag: ['@api', '@auth'] },

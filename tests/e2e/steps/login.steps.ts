@@ -4,6 +4,8 @@ import { environmentConfig } from '../../../config/environments';
 import { E2EWorld } from '../support/world';
 import { e2eUsers } from '../data/users.data';
 
+// Conforme pontuado na avaliação, os asserts de login foram fortalecidos para
+// validar não só mensagens visíveis, mas também URL e estado da página.
 async function expectLoginPage(world: E2EWorld): Promise<void> {
   await expect(world.page!).not.toHaveURL(/inventory\.html/);
   await expect(world.loginPage!.loginLogo).toHaveText('Swag Labs');

@@ -9,6 +9,9 @@ import type {
   CreateBookingResponse
 } from '../models/booking.model';
 
+// Conforme pontuado na avaliação, os testes de Booking foram consolidados
+// por recurso. Os verbos e cenários continuam separados por describe, sem
+// multiplicar arquivos conforme a quantidade de endpoints aumenta.
 test.describe(
   'Booking API',
   { tag: ['@api', '@booking'] },

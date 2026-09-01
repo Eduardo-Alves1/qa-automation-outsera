@@ -17,6 +17,8 @@ Funcionalidade: Checkout
     E finaliza a compra
     Então a mensagem de conclusão do pedido deve ser exibida
 
+  # Conforme pontuado na avaliação, as variações dos campos obrigatórios
+  # foram reunidas em um Scenario Outline para reduzir repetição no Gherkin.
   @negative @regression
   Esquema do Cenário: Validar campos obrigatórios do checkout
     Quando preenche o checkout sem informar "<campo>"

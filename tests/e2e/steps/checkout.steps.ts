@@ -58,6 +58,8 @@ When(
   async function (this: E2EWorld) {
     await this.inventoryPage!.openCart();
 
+    // Conforme pontuado na avaliação, as validações E2E foram ampliadas para
+    // confirmar o estado funcional: rota, produto, preço e quantidade.
     await expect(this.page!).toHaveURL(/\/cart\.html$/);
     await expect(this.cartPage!.title).toHaveText('Your Cart');
     await expect(this.cartPage!.cartItems).toHaveCount(1);

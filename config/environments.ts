@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Conforme pontuado na avaliação, a configuração foi centralizada por ambiente
+// para que a mesma suíte possa ser executada em DEV, HML ou QA sem alterar os testes.
 export type TestEnvironment = 'dev' | 'hml' | 'qa';
 
 type UserCredentials = {

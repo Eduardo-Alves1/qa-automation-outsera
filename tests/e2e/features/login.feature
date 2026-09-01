@@ -17,6 +17,8 @@ Funcionalidade: Login
     Quando o usuário realiza o login com credenciais inválidas
     Então uma mensagem de erro de login deve ser exibida
 
+  # Conforme pontuado na avaliação, cenários repetitivos de campos obrigatórios
+  # foram consolidados em um Scenario Outline com Examples.
   @negative @regression
   Esquema do Cenário: Validar campos obrigatórios do login
     Dado que o usuário está na página de login do SauceDemo

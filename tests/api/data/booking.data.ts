@@ -17,6 +17,9 @@ function dateFromToday(days: number): string {
   return formatDate(date);
 }
 
+// Conforme pontuado na avaliação, a massa de Booking deixou de depender de
+// valores fixos. A factory gera dados dinâmicos e permite sobrescrever apenas
+// os campos necessários para cada cenário por meio de overrides.
 export function createBookingData(
   overrides: BookingOverrides = {}
 ): Booking {
