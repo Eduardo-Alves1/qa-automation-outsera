@@ -18,7 +18,7 @@ Após o feedback técnico recebido, alguns pontos da arquitetura foram refatorad
 | **4. Scenario Outline nos cenários repetitivos** | Validações semelhantes de campos obrigatórios em Login e Checkout passaram a usar `Scenario Outline + Examples`. | Reduz repetição no Gherkin sem diminuir a cobertura. |
 | **5. Asserts E2E mais completos** | Os testes passaram a validar URL, estado da página, dados do produto, quantidade, preço, mensagens e resultado final do fluxo. | Aumenta a confiança funcional e evita testes baseados apenas em `toBeVisible()`. |
 
-> **Destaque:** essas melhorias não alteraram apenas a forma de escrever os testes. Elas foram aplicadas pensando em como a suíte se comportaria em um projeto maior, com mais ambientes, endpoints, massas e cenários.
+> **Destaque:** Essas melhorias não alteraram apenas a forma de escrever os testes. Elas foram aplicadas pensando em como a suíte se comportaria em um projeto maior, com mais ambientes, endpoints, massas e cenários, con forme comentário do avaliador.
 
 ## Escopo entregue
 
@@ -452,9 +452,11 @@ K6_PROFILE=constant \
 K6_VUS=500 \
 K6_DURATION=5m \
 k6 run tests/performance/load-test.js
+
+![alt text](image.png)
 ```
 
-A configuração está disponível, porém **não foi executada contra a API pública compartilhada**. O perfil pode ser utilizado em ambiente autorizado pelo avaliador.
+Foi executado um teste de carga progressiva com K6, aumentando a concorrência até **500** usuários virtuais. Durante a execução foram realizadas aproximadamente 76 mil requisições, sem falhas HTTP e com 100% dos checks atendidos. O p95 ficou em aproximadamente 394 ms e o p99 em 401 ms, ambos significativamente abaixo dos thresholds definidos. Dentro do cenário executado, não foi identificado indício de degradação relevante até 500 VUs.
 
 O workflow de performance é manual:
 
