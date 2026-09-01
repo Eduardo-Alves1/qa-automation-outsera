@@ -6,6 +6,20 @@ A solução utiliza **Playwright + TypeScript**, **Cucumber.js**, **K6**, **Allu
 
 > A automação **Mobile** não foi implementada por ser um item opcional da avaliação.
 
+## Melhorias aplicadas após a avaliação
+
+Após o feedback técnico recebido, alguns pontos da arquitetura foram refatorados para melhorar **manutenibilidade, escalabilidade e reutilização** da automação.
+
+| Melhoria | O que foi alterado | Benefício |
+|---|---|---|
+| **1. Configuração multiambiente** | Foi criada uma configuração centralizada para `dev`, `hml` e `qa`, com URLs e credenciais separadas por ambiente. | Permite executar a mesma suíte em ambientes diferentes sem alterar o código dos testes. |
+| **2. Factory dinâmica de Booking** | As massas fixas foram substituídas por `createBookingData()`, com geração dinâmica de dados e suporte a `overrides`. | Reduz duplicação e facilita criar variações de payload para diferentes cenários. |
+| **3. Specs consolidados por recurso** | Os vários arquivos separados por verbo/cenário foram reorganizados em `auth.spec.ts` e `booking.spec.ts`, usando `test.describe` internamente. | Evita crescimento excessivo de arquivos e melhora a manutenção da suíte. |
+| **4. Scenario Outline nos cenários repetitivos** | Validações semelhantes de campos obrigatórios em Login e Checkout passaram a usar `Scenario Outline + Examples`. | Reduz repetição no Gherkin sem diminuir a cobertura. |
+| **5. Asserts E2E mais completos** | Os testes passaram a validar URL, estado da página, dados do produto, quantidade, preço, mensagens e resultado final do fluxo. | Aumenta a confiança funcional e evita testes baseados apenas em `toBeVisible()`. |
+
+> **Destaque:** essas melhorias não alteraram apenas a forma de escrever os testes. Elas foram aplicadas pensando em como a suíte se comportaria em um projeto maior, com mais ambientes, endpoints, massas e cenários.
+
 ## Escopo entregue
 
 | Frente | Cobertura |
@@ -81,6 +95,8 @@ qa-automation-outsera/
 ```
 
 # Configuração de ambientes
+
+> **Melhoria aplicada:** a configuração deixou de depender de uma única URL fixa e passou a suportar múltiplos ambientes de forma centralizada.
 
 O projeto aceita três ambientes:
 
@@ -174,7 +190,7 @@ A suíte foi separada por responsabilidade:
 | `models` | contratos TypeScript |
 | `specs` | cenários e assertions |
 
-Os specs foram consolidados por **recurso**, evitando um arquivo para cada combinação de verbo e cenário:
+> **Melhoria aplicada:** os specs foram consolidados por **recurso**, evitando um arquivo para cada combinação de verbo e cenário.
 
 ```text
 auth.spec.ts
@@ -184,6 +200,8 @@ booking.spec.ts
 Dentro de `booking.spec.ts`, `test.describe` separa `GET`, `POST`, `PUT` e `DELETE`.
 
 ## Factory de Booking
+
+> **Melhoria aplicada:** as reservas deixaram de utilizar massas fixas repetidas e passaram a ser criadas por uma única factory dinâmica.
 
 `createBookingData()` gera uma reserva nova a cada chamada, incluindo nome, preço, datas e observação.
 
@@ -285,9 +303,11 @@ O E2E utiliza o SauceDemo e combina **BDD + Page Object Pattern**.
 - Reset App State;
 - All Items.
 
-Os cenários repetitivos de campos obrigatórios foram escritos com **Scenario Outline + Examples**, reduzindo duplicação na feature sem perder cobertura.
+> **Melhoria aplicada:** os cenários repetitivos de campos obrigatórios foram escritos com **Scenario Outline + Examples**, reduzindo duplicação na feature sem perder cobertura.
 
 ## Validações E2E
+
+> **Melhoria aplicada:** os asserts foram fortalecidos para validar não apenas a presença de elementos, mas também o estado funcional resultante de cada ação.
 
 Os testes não verificam apenas visibilidade. Dependendo do fluxo também são validados:
 
@@ -299,6 +319,15 @@ Os testes não verificam apenas visibilidade. Dependendo do fluxo também são v
 - subtotal, imposto e total;
 - estado da sessão após login/logout;
 - estado do carrinho após Reset App State e após conclusão do pedido.
+
+Exemplo de validação de regra no checkout:
+
+```ts
+expect(subtotal).toBe(products.backpack.price);
+expect(tax).toBeGreaterThan(0);
+expect(total).toBeGreaterThan(subtotal);
+expect(total).toBeCloseTo(subtotal + tax, 2);
+```
 
 Em caso de falha, o hook `After` captura screenshot e anexa a evidência ao relatório.
 
@@ -447,17 +476,17 @@ O SauceDemo não possui formulário real de cartão. Por isso, os cenários nega
 
 # Boas práticas aplicadas
 
-- configuração centralizada por ambiente;
+- **configuração centralizada por ambiente**;
 - TypeScript em modo `strict`;
 - API Clients;
-- Test Data Factory com overrides;
-- dados dinâmicos para reservas e checkout;
-- specs organizados por recurso;
+- **Test Data Factory com overrides**;
+- **dados dinâmicos para reservas e checkout**;
+- **specs organizados por recurso**;
 - BDD com Cucumber/Gherkin;
-- Scenario Outline para cenários repetitivos;
+- **Scenario Outline para cenários repetitivos**;
 - Page Object Pattern;
 - World isolado por cenário;
-- asserts de estado e dados de negócio;
+- **asserts de estado e dados de negócio**;
 - tags de smoke, regressão, domínio e verbo;
 - screenshots automáticos em falha;
 - Allure unificado;
