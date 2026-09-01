@@ -74,6 +74,13 @@ Then(
   'o carrinho deve ficar vazio',
   async function (this: E2EWorld) {
     await expect(this.inventoryPage!.cartBadge).toBeHidden();
+
+    // O reset atualiza o estado da aplicação, mas o botão do produto
+    // só reflete esse novo estado depois que a página é carregada novamente.
+    await this.page!.reload();
+
+    await expect(this.page!).toHaveURL(/\/inventory\.html$/);
+    await expect(this.inventoryPage!.cartBadge).toBeHidden();
     await expect(
       this.inventoryPage!.productAddButton(products.backpack.slug)
     ).toBeVisible();
